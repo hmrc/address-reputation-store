@@ -35,7 +35,7 @@ trait SimpleLogger {
 
 class LoggerFacade(underlying: Logger) extends SimpleLogger {
   override def info(format: String, arguments: AnyRef*) {
-    underlying.info(format, arguments: _*)
+    underlying.info(format, arguments.toArray)
   }
 
   override def info(msg: String, t: Throwable) {
@@ -43,7 +43,7 @@ class LoggerFacade(underlying: Logger) extends SimpleLogger {
   }
 
   override def warn(format: String, arguments: AnyRef*) {
-    underlying.warn(format, arguments: _*)
+    underlying.warn(format, arguments.toArray)
   }
 
   override def warn(msg: String, t: Throwable) {
@@ -51,7 +51,7 @@ class LoggerFacade(underlying: Logger) extends SimpleLogger {
   }
 
   override def error(format: String, arguments: AnyRef*) {
-    underlying.error(format, arguments: _*)
+    underlying.error(format, arguments.toArray)
   }
 
   override def error(msg: String, t: Throwable) {

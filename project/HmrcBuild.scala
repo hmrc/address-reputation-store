@@ -24,12 +24,13 @@ object HmrcBuild extends Build {
 
   val appName = "address-reputation-store"
 
-  lazy val microservice = Project(appName, file("."))
+  lazy val library = Project(appName, file("."))
     .enablePlugins(SbtAutoBuildPlugin, SbtGitVersioning)
     .settings(
       scalaVersion := "2.11.7",
       libraryDependencies ++= AppDependencies(),
       crossScalaVersions := Seq("2.11.7"),
+      parallelExecution in Test := false,
       resolvers := Seq(
         Resolver.bintrayRepo("hmrc", "releases"), "typesafe-releases" at "http://repo.typesafe.com/typesafe/releases/")
     )
@@ -37,12 +38,12 @@ object HmrcBuild extends Build {
 
 private object AppDependencies {
 
-  import play.PlayImport._
-  import play.core.PlayVersion
+//  import play.PlayImport._
+//  import play.core.PlayVersion
 
   val compile = Seq(
-    "com.typesafe.play" %% "play" % PlayVersion.current,
-    ws,
+//    "com.typesafe.play" %% "play" % PlayVersion.current,
+//    ws,
 //    "uk.gov.hmrc" %% "time" % "2.0.0",
     "uk.gov.hmrc" %% "http-exceptions" % "1.0.0",
 //    "uk.gov.hmrc" %% "play-reactivemongo" % "4.7.1",
@@ -58,7 +59,7 @@ private object AppDependencies {
 //    "org.apache.commons" % "commons-compress" % "1.10",
 //    "commons-net" % "commons-net" % "3.4",
     "com.univocity" % "univocity-parsers" % "1.5.6",
-    "org.mongodb" %% "casbah" % "3.1.0"
+    "org.mongodb" %% "casbah" % "3.1.1"
   )
 
   trait TestDependencies {
@@ -69,14 +70,15 @@ private object AppDependencies {
   object Test {
     def apply() = new TestDependencies {
       override lazy val test = Seq(
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+//        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
 //        "commons-codec" % "commons-codec" % "1.7" % scope,
         "org.scalatest" %% "scalatest" % "2.2.4" % scope,
         "org.scalacheck" %% "scalacheck" % "1.12.2" % scope,
-        "org.pegdown" % "pegdown" % "1.5.0" % scope
+        "com.github.simplyscala" %% "scalatest-embedmongo" % "0.2.2" % scope,
+        "org.pegdown" % "pegdown" % "1.5.0" % scope,
 //        "com.github.tomakehurst" % "wiremock" % "1.52" % scope,
 //        "uk.gov.hmrc" %% "http-verbs-test" % "0.1.0" % scope
-//        "org.mockito" % "mockito-all" % "1.10.19" % scope
+        "org.mockito" % "mockito-all" % "1.10.19" % scope
       )
     }.test
   }
