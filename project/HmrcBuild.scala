@@ -38,26 +38,10 @@ object HmrcBuild extends Build {
 
 private object AppDependencies {
 
-//  import play.PlayImport._
-//  import play.core.PlayVersion
+  // Important note: Play is *not* a dependency here, nor is it a transitive dependency.
 
   val compile = Seq(
-//    "com.typesafe.play" %% "play" % PlayVersion.current,
-//    ws,
-//    "uk.gov.hmrc" %% "time" % "2.0.0",
-    "uk.gov.hmrc" %% "http-exceptions" % "1.0.0",
-//    "uk.gov.hmrc" %% "play-reactivemongo" % "4.7.1",
-//    "uk.gov.hmrc" %% "microservice-bootstrap" % "4.2.1",
-//    "uk.gov.hmrc" %% "play-authorisation" % "3.1.0",
-//    "uk.gov.hmrc" %% "play-health" % "1.1.0",
-//    "uk.gov.hmrc" %% "play-url-binders" % "1.0.0",
-//    "uk.gov.hmrc" %% "play-config" % "2.0.1",
-//    "uk.gov.hmrc" %% "play-json-logger" % "2.1.1",
-//    "uk.gov.hmrc" %% "domain" % "3.3.0",
-//    "org.apache.ftpserver" % "ftpserver" % "1.0.5",
-//    "org.simpleflatmapper" % "sfm" % "2.2",
-//    "org.apache.commons" % "commons-compress" % "1.10",
-//    "commons-net" % "commons-net" % "3.4",
+    "org.reactivemongo" %% "reactivemongo" % "0.11.10",
     "com.univocity" % "univocity-parsers" % "1.5.6",
     "org.mongodb" %% "casbah" % "3.1.1"
   )
@@ -70,14 +54,10 @@ private object AppDependencies {
   object Test {
     def apply() = new TestDependencies {
       override lazy val test = Seq(
-//        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-//        "commons-codec" % "commons-codec" % "1.7" % scope,
         "org.scalatest" %% "scalatest" % "2.2.4" % scope,
         "org.scalacheck" %% "scalacheck" % "1.12.2" % scope,
         "com.github.simplyscala" %% "scalatest-embedmongo" % "0.2.2" % scope,
         "org.pegdown" % "pegdown" % "1.5.0" % scope,
-//        "com.github.tomakehurst" % "wiremock" % "1.52" % scope,
-//        "uk.gov.hmrc" %% "http-verbs-test" % "0.1.0" % scope
         "org.mockito" % "mockito-all" % "1.10.19" % scope
       )
     }.test
