@@ -28,7 +28,5 @@ case class DbAddress(uprn: String, line1: String, line2: String, line3: String, 
   }
 
   def asMongoDBObject = MongoDBObject("uprn" -> uprn, "line1" -> line1, "line2" -> line2, "line3" -> line3, "town" -> town, "postcode" -> postcode)
-
-  private def prefixedId(id: String) = if (id.startsWith("GB")) id else "GB" + id
 }
 
