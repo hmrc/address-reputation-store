@@ -16,8 +16,6 @@
 
 package uk.co.hmrc.address.osgb
 
-import com.mongodb.casbah.Imports._
-
 case class DbAddress(uprn: String, line1: String, line2: String, line3: String, town: String, postcode: String) {
 
   def line123Contains(filterStr: String): Boolean = {
@@ -27,6 +25,10 @@ case class DbAddress(uprn: String, line1: String, line2: String, line3: String, 
       line3.toUpperCase.contains(filter)
   }
 
-  def asMongoDBObject = MongoDBObject("uprn" -> uprn, "line1" -> line1, "line2" -> line2, "line3" -> line3, "town" -> town, "postcode" -> postcode)
+  // For use as input to MongoDbObject (hence it's not a Map)
+  def tupled = List("uprn" -> uprn, "line1" -> line1, "line2" -> line2, "line3" -> line3, "town" -> town, "postcode" -> postcode)
+
+  // Could instead use this.productIterator.map(_.toString).toSeq, but this is simpler.
+  def toSeq: Seq[String] = Seq(uprn, line1, line2, line3, town, postcode)
 }
 

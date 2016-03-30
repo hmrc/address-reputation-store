@@ -20,24 +20,32 @@ import org.scalatest.FunSuite
 
 class DbAddressTest extends FunSuite {
 
-  val dummyInAddr = DbAddress("47070784", "Line1", "Line2", "Line3", "Tynemouth", "NE30 4HG")
+  val a = DbAddress("47070784", "Line1", "Line2", "Line3", "Tynemouth", "NE30 4HG")
 
-  test("ShouldKeep - check we can find a match in line1, case insensitive") {
-    assert(dummyInAddr.line123Contains("e1") === true)
-    assert(dummyInAddr.line123Contains("E1") === true)
+  test("line123Contains - check we can find a match in line1, case insensitive") {
+    assert(a.line123Contains("e1") === true)
+    assert(a.line123Contains("E1") === true)
   }
 
-  test("ShouldKeep - check we can find a match in line2, case insensitive") {
-    assert(dummyInAddr.line123Contains("e2") === true)
-    assert(dummyInAddr.line123Contains("E2") === true)
+  test("line123Contains - check we can find a match in line2, case insensitive") {
+    assert(a.line123Contains("e2") === true)
+    assert(a.line123Contains("E2") === true)
   }
 
-  test("ShouldKeep - check we can find a match in line3, case insensitive") {
-    assert(dummyInAddr.line123Contains("e3") === true)
-    assert(dummyInAddr.line123Contains("E3") === true)
+  test("line123Contains - check we can find a match in line3, case insensitive") {
+    assert(a.line123Contains("e3") === true)
+    assert(a.line123Contains("E3") === true)
   }
 
-  test("ShouldKeep - unmatched string should lead to the address being rejected") {
-    assert(dummyInAddr.line123Contains("SOMETHING") === false)
+  test("line123Contains - unmatched string should lead to the address being rejected") {
+    assert(a.line123Contains("SOMETHING") === false)
+  }
+
+  test("tupled") {
+    assert(a.tupled === List("uprn" -> "47070784", "line1" -> "Line1", "line2" -> "Line2", "line3" -> "Line3", "town" -> "Tynemouth", "postcode" -> "NE30 4HG"))
+  }
+
+  test("toSeq") {
+    assert(a.toSeq === Seq("47070784", "Line1", "Line2", "Line3", "Tynemouth", "NE30 4HG"))
   }
 }
