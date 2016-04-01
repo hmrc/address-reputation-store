@@ -21,20 +21,20 @@ import reactivemongo.bson.{BSONDocument, BSONDocumentReader}
 object BSONDbAddress extends BSONDocumentReader[DbAddress] {
 
   def read(bson: BSONDocument): DbAddress = {
-    val id = bson.getAs[String]("_id").get
+    val id = bson.getAs[String]("_id")
     val lines = bson.getAs[List[String]]("lines")
-    val town = bson.getAs[String]("town").get
-    val postcode = bson.getAs[String]("postcode").get
+    val town = bson.getAs[String]("town")
+    val postcode = bson.getAs[String]("postcode")
 
     if (lines.isDefined) {
-      new DbAddress(id, lines.get, town, postcode)
+      new DbAddress(id.get, lines.get, town.get, postcode.get)
 
     } else {
       // backward compatibility
       val line1 = bson.getAs[String]("line1").get
       val line2 = bson.getAs[String]("line2").get
       val line3 = bson.getAs[String]("line3").get
-      DbAddress(id, line1, line2, line3, town, postcode)
+      DbAddress(id.get, line1, line2, line3, town.get, postcode.get)
     }
   }
 }
