@@ -47,4 +47,22 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
     assert(DbAddress(new MongoDBObject(list(1))) === a2)
   }
 
+  test("write then read using Casbah - old representation using line1,line2,line3") {
+    val logger = new StubLogger(true)
+    val mongoConnection = casbahMongoConnection()
+    val collection = mongoConnection.getConfiguredDb("address")
+    collection.drop()
+
+    val tuples = List("_id" -> a1.id, "line1" -> a1.line1, "line2" -> a1.line2, "line3" -> a1.line3, "town" -> a1.town, "postcode" -> a1.postcode)
+    val m1 = MongoDBObject(tuples)
+    collection.insert(m1)
+
+    assert(collection.size === 1)
+
+    val r1 = collection.findOne(MongoDBObject("postcode" -> "NE30 4HG")).get
+    assert(r1 === m1)
+
+    assert(DbAddress(new MongoDBObject(r1)) === a1)
+  }
+
 }

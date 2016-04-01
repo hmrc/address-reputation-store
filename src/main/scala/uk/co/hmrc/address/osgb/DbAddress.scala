@@ -51,10 +51,18 @@ object DbAddress {
 
   def apply(o: MongoDBObject): DbAddress = {
     val id = o.as[String]("_id")
-    val lines = o.as[List[String]]("lines")
     val town = o.as[String]("town")
     val postcode = o.as[String]("postcode")
-    new DbAddress(id, lines, town, postcode)
+    if (o.containsField("lines")) {
+      val lines = o.as[List[String]]("lines")
+      new DbAddress(id, lines, town, postcode)
+    } else {
+      // backward compatibility
+      val line1 = o.as[String]("line1")
+      val line2 = o.as[String]("line2")
+      val line3 = o.as[String]("line3")
+      DbAddress(id, line1, line2, line3, town, postcode)
+    }
   }
 
 }
