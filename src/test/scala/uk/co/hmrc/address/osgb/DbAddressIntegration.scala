@@ -16,26 +16,32 @@
 
 package uk.co.hmrc.address.osgb
 
+import com.mongodb.casbah.commons.Imports._
 import com.mongodb.casbah.commons.MongoDBObject
 import org.scalatest.FunSuite
+import reactivemongo.bson.{BSONArray, BSONDocument, BSONString}
 import uk.co.hmrc.helper.EmbeddedMongoSuite
-import uk.co.hmrc.logging.StubLogger
 
 class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
 
   val a1 = DbAddress("GB47070784", "A1", "Line2", "Line3", "Tynemouth", "NE30 4HG")
   val a2 = DbAddress("GB47070785", "A2", "Line2", "Line3", "Tynemouth", "NE30 4HG")
 
-  test("write then read using Casbah") {
-    val logger = new StubLogger(true)
+  def casbahFixtures(m: DBObject*) = {
     val mongoConnection = casbahMongoConnection()
     val collection = mongoConnection.getConfiguredDb("address")
     collection.drop()
 
+    for (x <- m) {
+      collection.insert(x)
+    }
+    collection
+  }
+
+  test("write then read using Casbah") {
     val m1 = MongoDBObject(a1.tupled)
     val m2 = MongoDBObject(a2.tupled)
-    collection.insert(m1)
-    collection.insert(m2)
+    val collection = casbahFixtures(m1, m2)
 
     assert(collection.size === 2)
 
@@ -48,14 +54,9 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
   }
 
   test("write then read using Casbah - old representation using line1,line2,line3") {
-    val logger = new StubLogger(true)
-    val mongoConnection = casbahMongoConnection()
-    val collection = mongoConnection.getConfiguredDb("address")
-    collection.drop()
-
     val tuples = List("_id" -> a1.id, "line1" -> a1.line1, "line2" -> a1.line2, "line3" -> a1.line3, "town" -> a1.town, "postcode" -> a1.postcode)
     val m1 = MongoDBObject(tuples)
-    collection.insert(m1)
+    val collection = casbahFixtures(m1)
 
     assert(collection.size === 1)
 
@@ -63,6 +64,30 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
     assert(r1 === m1)
 
     assert(DbAddress(new MongoDBObject(r1)) === a1)
+  }
+
+  test("read (only) using ReactiveMongo") {
+    val id = BSONString(a1.id)
+    val lines = BSONArray(a1.lines.map(s => BSONString(s)))
+    val town = BSONString(a1.town)
+    val postcode = BSONString(a1.postcode)
+    val bson = BSONDocument("_id" -> id, "lines" -> lines, "town" -> town, "postcode" -> postcode)
+    val r = BSONDbAddress.read(bson)
+
+    assert(r === a1)
+  }
+
+  test("read (only) using ReactiveMongo - old representation using line1,line2,line3") {
+    val id = BSONString(a1.id)
+    val line1 = BSONString(a1.line1)
+    val line2 = BSONString(a1.line2)
+    val line3 = BSONString(a1.line3)
+    val town = BSONString(a1.town)
+    val postcode = BSONString(a1.postcode)
+    val bson = BSONDocument("_id" -> id, "line1" -> line1, "line2" -> line2, "line3" -> line3, "town" -> town, "postcode" -> postcode)
+    val r = BSONDbAddress.read(bson)
+
+    assert(r === a1)
   }
 
 }
