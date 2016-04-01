@@ -16,19 +16,45 @@
 
 package uk.co.hmrc.address.osgb
 
-case class DbAddress(uprn: String, line1: String, line2: String, line3: String, town: String, postcode: String) {
+import com.mongodb.casbah.commons.MongoDBObject
 
-  def line123Contains(filterStr: String): Boolean = {
+// id typically consists of some prefix and the uprn
+case class DbAddress(id: String, lines: List[String], town: String, postcode: String) {
+
+  def linesContainIgnoreCase(filterStr: String): Boolean = {
     val filter = filterStr.toUpperCase
-    line1.toUpperCase.contains(filter) ||
-      line2.toUpperCase.contains(filter) ||
-      line3.toUpperCase.contains(filter)
+    lines.map(_.toUpperCase).exists(_.contains(filter))
   }
 
-  // For use as input to MongoDbObject (hence it's not a Map)
-  def tupled = List("uprn" -> uprn, "line1" -> line1, "line2" -> line2, "line3" -> line3, "town" -> town, "postcode" -> postcode)
+  def line1 = if (lines.nonEmpty) lines.head else ""
 
-  // Could instead use this.productIterator.map(_.toString).toSeq, but this is simpler.
-  def toSeq: Seq[String] = Seq(uprn, line1, line2, line3, town, postcode)
+  def line2 = if (lines.size > 1) lines(1) else ""
+
+  def line3 = if (lines.size > 2) lines(2) else ""
+
+  // For use as input to MongoDbObject (hence it's not a Map)
+  def tupled = List("_id" -> id, "lines" -> lines, "town" -> town, "postcode" -> postcode)
+
+  // For use as input to CSV generation etc.
+  // Could instead use `this.productIterator.map(_.toString).toSeq`, but this is simpler.
+  def toSeq: Seq[String] = Seq(id, line1, line2, line3, town, postcode)
+
+  def splitPostcode = Postcode(postcode)
 }
 
+
+object DbAddress {
+
+  def apply(id: String, line1: String, line2: String, line3: String, town: String, postcode: String): DbAddress = {
+    apply(id, List(line1, line2, line3).filterNot(_ == ""), town, postcode)
+  }
+
+  def apply(o: MongoDBObject): DbAddress = {
+    val id = o.as[String]("_id")
+    val lines = o.as[List[String]]("lines")
+    val town = o.as[String]("town")
+    val postcode = o.as[String]("postcode")
+    new DbAddress(id, lines, town, postcode)
+  }
+
+}

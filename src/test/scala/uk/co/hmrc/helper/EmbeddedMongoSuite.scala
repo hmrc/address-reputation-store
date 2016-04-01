@@ -19,6 +19,7 @@ package uk.co.hmrc.helper
 import com.github.simplyscala.MongoEmbedDatabase
 import org.scalatest.{Args, Status, Suite}
 import uk.co.hmrc.address.admin.MetadataStoreTest
+import uk.co.hmrc.address.osgb.DbAddressIntegration
 import uk.co.hmrc.address.services.mongo.CasbahMongoConnection
 
 // The primary objective is to start and stop embedded MongoDB cleanly exactly once.
@@ -29,7 +30,8 @@ object EmbeddedMongoSuite extends Suite with MongoEmbedDatabase {
   //------------------------------------------------
   var HowManyTestSuitesAreUsingThisServerWrapper =
     Set(
-      classOf[MetadataStoreTest]
+      classOf[MetadataStoreTest],
+      classOf[DbAddressIntegration]
     ).size
   //------------------------------------------------
 

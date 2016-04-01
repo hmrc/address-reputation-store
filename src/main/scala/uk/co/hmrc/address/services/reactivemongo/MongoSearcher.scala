@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.co.hmrc.address.services.mongo
+package uk.co.hmrc.address.services.reactivemongo
 
 import reactivemongo.api.ReadPreference
 import reactivemongo.bson.BSONDocument

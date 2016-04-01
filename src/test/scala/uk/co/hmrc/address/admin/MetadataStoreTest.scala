@@ -30,7 +30,7 @@ class MetadataStoreTest extends WordSpec with EmbeddedMongoSuite {
       """ in {
         val logger = new StubLogger(true)
         val mongoConnection = casbahMongoConnection()
-        val collection = mongoConnection.getConfiguredDb("test")
+        val collection = mongoConnection.getConfiguredDb("admin")
         collection.drop()
 
         val keyValue = new MongoStoredMetadataItem(collection, "keyValue", "started", logger)
@@ -62,7 +62,7 @@ class MetadataStoreTest extends WordSpec with EmbeddedMongoSuite {
       """ in {
         val logger = new StubLogger(true)
         val mongoConnection = casbahMongoConnection()
-        val collection = mongoConnection.getConfiguredDb("test")
+        val collection = mongoConnection.getConfiguredDb("admin")
         collection.drop()
 
         val dLock = new MongoStoredMetadataItem(collection, "dLock", "started", logger)

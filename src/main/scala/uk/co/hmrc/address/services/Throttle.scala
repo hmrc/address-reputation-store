@@ -42,7 +42,7 @@ private object FairLock extends ReentrantLock(true)
 class Throttle(delayPerItem: Long, backoffFactor: Float, time: Time) {
 
   /** Grab the lock here, then start some work. */
-  def start():TimedLock = new TimedLock(delayPerItem, backoffFactor, time)
+  def start(): TimedLock = new TimedLock(delayPerItem, backoffFactor, time)
 }
 
 
@@ -86,13 +86,14 @@ class TimedLock(val delayPerItem: Long, backoffFactor: Float, time: Time) {
 /** Provides a seam for testing */
 trait Time {
   def now(): Long
+
   def sleep(ms: Long)
 }
 
 object NormalTime extends Time {
   val clock = Clock.systemDefaultZone
 
-  override def now():Long = clock.millis
+  override def now(): Long = clock.millis
 
   override def sleep(ms: Long) {
     Thread.sleep(ms)
