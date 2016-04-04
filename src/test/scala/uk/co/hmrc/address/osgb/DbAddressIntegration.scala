@@ -77,7 +77,7 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
     assert(r === a1)
   }
 
-  test("read (only) using ReactiveMongo - old representation using line1,line2,line3") {
+  test("read (only) using ReactiveMongo - old representation using line1,line2,line3 - full case") {
     val id = BSONString(a1.id)
     val line1 = BSONString(a1.line1)
     val line2 = BSONString(a1.line2)
@@ -88,6 +88,16 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
     val r = BSONDbAddress.read(bson)
 
     assert(r === a1)
+  }
+
+  test("read (only) using ReactiveMongo - old representation using line1,line2,line3 - empty case") {
+    val id = BSONString(a1.id)
+    val postcode = BSONString(a1.postcode)
+    val bson = BSONDocument("_id" -> id, "postcode" -> postcode)
+    val r = BSONDbAddress.read(bson)
+
+    assert(r === new DbAddress("GB47070784", Nil, "", "NE30 4HG"))
+
   }
 
 }
