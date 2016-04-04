@@ -31,10 +31,12 @@ object BSONDbAddress extends BSONDocumentReader[DbAddress] {
 
     } else {
       // backward compatibility
+      val uprn = id.orElse(bson.getAs[String]("uprn")).get
+      val id2 = if (uprn.startsWith("GB")) uprn else "GB" + uprn
       val line1 = bson.getAs[String]("line1").getOrElse("")
       val line2 = bson.getAs[String]("line2").getOrElse("")
       val line3 = bson.getAs[String]("line3").getOrElse("")
-      DbAddress(id.get, line1, line2, line3, town, postcode.get)
+      DbAddress(id2, line1, line2, line3, town, postcode.get)
     }
   }
 }
