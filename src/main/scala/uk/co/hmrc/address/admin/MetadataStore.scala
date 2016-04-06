@@ -25,7 +25,8 @@ class MetadataStore(mongoDbConnection: CasbahMongoConnection, logger: SimpleLogg
 
   private val collection: MongoCollection = mongoDbConnection.getConfiguredDb("admin")
 
-  val addressBaseCollectionName = new MongoStoredMetadataItem(collection, "addressBaseCollectionName", "addressbase", logger)
+  val gbAddressBaseCollectionName = new MongoStoredMetadataItem(collection, "gbAddressBaseCollectionName", "addressbase_gb", logger)
+  val niAddressBaseCollectionName = new MongoStoredMetadataItem(collection, "niAddressBaseCollectionName", "addressbase_ni", logger)
 }
 
 
