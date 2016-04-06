@@ -23,10 +23,10 @@ import uk.co.hmrc.logging.SimpleLogger
 
 class MetadataStore(mongoDbConnection: CasbahMongoConnection, logger: SimpleLogger) {
 
-  private val collection: MongoCollection = mongoDbConnection.getConfiguredDb("admin")
+  val adminCollection: MongoCollection = mongoDbConnection.getConfiguredDb("admin")
 
-  val gbAddressBaseCollectionName = new MongoStoredMetadataItem(collection, "gbAddressBaseCollectionName", "addressbase_gb", logger)
-  val niAddressBaseCollectionName = new MongoStoredMetadataItem(collection, "niAddressBaseCollectionName", "addressbase_ni", logger)
+  val gbAddressBaseCollectionName = new MongoStoredMetadataItem(adminCollection, "gbAddressBaseCollectionName", "addressbase", logger)
+  val niAddressBaseCollectionName = new MongoStoredMetadataItem(adminCollection, "niAddressBaseCollectionName", "addressbase_ni", logger)
 }
 
 

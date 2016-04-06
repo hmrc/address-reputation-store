@@ -18,6 +18,7 @@ package uk.co.hmrc.address.osgb
 
 import org.scalatest.FunSuite
 
+//@RunWith(classOf[JUnitRunner])
 class PostcodeTest extends FunSuite {
 
   test(
