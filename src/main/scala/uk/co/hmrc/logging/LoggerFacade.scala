@@ -17,6 +17,7 @@
 package uk.co.hmrc.logging
 
 import org.slf4j.Logger
+import org.slf4j.helpers.MessageFormatter
 
 trait SimpleLogger {
   def info(format: String, arguments: AnyRef*)
@@ -56,5 +57,39 @@ class LoggerFacade(underlying: Logger) extends SimpleLogger {
 
   override def error(msg: String, t: Throwable) {
     underlying.error(msg, t)
+  }
+}
+
+
+/** Logger to stdout for command-line apps. */
+object Stdout extends SimpleLogger {
+  override def info(format: String, arguments: AnyRef*) {
+    val tp = MessageFormatter.arrayFormat(format, arguments.toArray)
+    println(tp.getMessage)
+  }
+
+  override def info(msg: String, t: Throwable) {
+    println(msg)
+    t.printStackTrace(System.out)
+  }
+
+  override def warn(format: String, arguments: AnyRef*) {
+    val tp = MessageFormatter.arrayFormat(format, arguments.toArray)
+    println("WARN: " + tp.getMessage)
+  }
+
+  override def warn(msg: String, t: Throwable) {
+    println("WARN: " + msg)
+    t.printStackTrace(System.out)
+  }
+
+  override def error(format: String, arguments: AnyRef*) {
+    val tp = MessageFormatter.arrayFormat(format, arguments.toArray)
+    println("ERROR: " + tp.getMessage)
+  }
+
+  override def error(msg: String, t: Throwable) {
+    println("ERROR: " + msg)
+    t.printStackTrace(System.out)
   }
 }
