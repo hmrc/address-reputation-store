@@ -16,6 +16,7 @@
 
 package uk.co.hmrc.address.osgb
 
+import com.mongodb.DBObject
 import com.mongodb.casbah.commons.MongoDBObject
 
 // id typically consists of some prefix and the uprn
@@ -40,6 +41,15 @@ case class DbAddress(id: String, lines: List[String], town: String, postcode: St
   def toSeq: Seq[String] = Seq(id, line1, line2, line3, town, postcode)
 
   def splitPostcode = Postcode(postcode)
+
+  def mongoDBObject(address: DbAddress): DBObject = {
+    MongoDBObject(
+      "_id" -> address.id,
+      "lines" -> address.lines,
+      "town" -> address.town,
+      "postcode" -> address.postcode
+    )
+  }
 }
 
 

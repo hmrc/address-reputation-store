@@ -23,12 +23,16 @@ class CasbahMongoConnection(mongoUri: String) {
 
   val hasReplicas = mongoUri.indexOf(',') > 0
   val mongoDbName: String = mongoUri.divideLast('/')(1)
+  private lazy val mongoClient = MongoClient(MongoClientURI(mongoUri))
 
   lazy val getConfiguredDb: MongoDB = {
-    val mongoClient = MongoClient(MongoClientURI(mongoUri))
     val db = mongoClient(mongoDbName)
     val writeConcern = if (hasReplicas) WriteConcern.Majority else WriteConcern.Acknowledged
     db.setWriteConcern(writeConcern)
     db
+  }
+
+  def close(): Unit = {
+    mongoClient.close()
   }
 }
