@@ -42,12 +42,12 @@ case class DbAddress(id: String, lines: List[String], town: String, postcode: St
 
   def splitPostcode = Postcode(postcode)
 
-  def mongoDBObject(address: DbAddress): DBObject = {
+  def mongoDBObject: DBObject = {
     MongoDBObject(
-      "_id" -> address.id,
-      "lines" -> address.lines,
-      "town" -> address.town,
-      "postcode" -> address.postcode
+      "_id" -> id,
+      "lines" -> lines,
+      "town" -> town,
+      "postcode" -> postcode
     )
   }
 }
