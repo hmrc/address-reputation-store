@@ -19,20 +19,29 @@ package uk.co.hmrc.address.services
 import org.scalatest.FunSuite
 
 class CapitalisationTest extends FunSuite {
+  import Capitalisation._
 
   def tryNormaliseAddressLine(expected: String) {
-    assert(Capitalisation.normaliseAddressLine(expected.toUpperCase) === expected)
-    assert(Capitalisation.normaliseAddressLine(expected.toLowerCase) === expected)
+    assert(normaliseAddressLine(expected.toUpperCase) === expected)
+    assert(normaliseAddressLine(expected.toLowerCase) === expected)
   }
 
 
   test(
     """edge cases""") {
-    assert(Capitalisation.normaliseAddressLine("") === "", "blank")
-    assert(Capitalisation.normaliseAddressLine("  ") === "", "blank")
-    assert(Capitalisation.normaliseAddressLine("UNITS 2 - 5, MANOR COURTYARD") === "Units 2 - 5, Manor Courtyard", "spaces surrounding hyphen")
-    assert(Capitalisation.normaliseAddressLine("- - - -") === "- - - -", "alternating hyphens and spaces")
-    assert(Capitalisation.normaliseAddressLine(" - - - ") === "- - -", "alternating spaces and hyphens")
+    assert(normaliseAddressLine("") === "", "blank")
+    assert(normaliseAddressLine("  ") === "", "blank")
+    assert(normaliseAddressLine("UNITS 2 - 5, MANOR COURTYARD") === "Units 2 - 5, Manor Courtyard", "spaces surrounding hyphen")
+    assert(normaliseAddressLine("- - - -") === "- - - -", "alternating hyphens and spaces")
+    assert(normaliseAddressLine(" - - - ") === "- - -", "alternating spaces and hyphens")
+  }
+
+  test(
+    """Given an address line with duplicate spaces,
+      when normalised,
+      then the duplicate spaces should be reduced
+    """) {
+    assert(normaliseAddressLine("78  Rivermead  Road") === "78 Rivermead Road") // EX2 4RL
   }
 
   test(

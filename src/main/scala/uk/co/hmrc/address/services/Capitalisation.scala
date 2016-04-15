@@ -24,19 +24,18 @@ object Capitalisation {
   def normaliseAddressLine(line: String): String = normalise(line.trim.toLowerCase)
 
   private def normalise(phrase: String): String = {
-    val words: Seq[String] = phrase.split(' ')
+    val words: Seq[String] = phrase.split(' ').filterNot(_ == "")
 
-    if (words.length == 1) asFirstWord(words.head)
+    if (words.isEmpty) ""
+    else if (words.length == 1) asFirstWord(words.head)
     else asFirstWord(words.head) + words.tail.map(asOtherWord).mkString(" ", " ", "")
   }
-
 
   private def joinDashedWords(first: String, rest: Seq[String]): String =
     if (rest.isEmpty) first
     else first + rest.map(capitaliseRestOfSubwords).mkString("-", "-", "")
 
   private def splitOnDash(phrase: String): Seq[String] = phrase.split('-')
-
 
   private def asFirstWord(word: String): String = {
     val dashedPhrase = splitOnDash(word)
@@ -47,7 +46,6 @@ object Capitalisation {
     val dashedPhrase = splitOnDash(word)
     if (dashedPhrase.nonEmpty) joinDashedWords(capitaliseRestOfSubwords(dashedPhrase.head), dashedPhrase.tail) else "-"
   }
-
 
   private def capitaliseRestOfSubwords(word: String): String =
     if (stopWords.contains(word)) word else capitaliseSpecialCases(word)
