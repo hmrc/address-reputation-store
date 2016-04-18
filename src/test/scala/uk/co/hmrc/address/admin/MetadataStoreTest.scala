@@ -36,17 +36,17 @@ class MetadataStoreTest extends WordSpec with EmbeddedMongoSuite {
         val keyValue = new MongoStoredMetadataItem(collection, "keyValue", "started", logger)
         assert(keyValue.get === "started")
 
-        keyValue.set("foo")
+        assert(keyValue.set("foo") === 1)
         assert(keyValue.get === "foo")
         assert(keyValue.verify("foo") === true)
         assert(keyValue.verify("bar") === false)
 
-        keyValue.set("foo")
+        assert(keyValue.set("foo") === 1)
         assert(keyValue.get === "foo")
         assert(keyValue.verify("foo") === true)
         assert(keyValue.verify("bar") === false)
 
-        keyValue.set("bar")
+        assert(keyValue.set("bar") === 1)
         assert(keyValue.get === "bar")
 
         keyValue.reset()

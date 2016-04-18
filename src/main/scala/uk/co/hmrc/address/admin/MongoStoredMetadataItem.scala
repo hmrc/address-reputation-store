@@ -44,7 +44,7 @@ class MongoStoredMetadataItem(collection: MongoCollection, itemKey: String, init
   /**
     * Sets key/value item to a new value.
     */
-  def set(newValue: String) {
+  def set(newValue: String): Int = {
     val filter = "_id" $eq itemKey
     val doc = MongoDBObject("_id" -> itemKey, "value" -> newValue)
     update(initialValue, filter, doc)
@@ -101,14 +101,14 @@ class MongoStoredMetadataItem(collection: MongoCollection, itemKey: String, init
   private def atomicUpdate(oldValue: String, newValue: String): Boolean = {
     val filter = $and("_id" $eq itemKey, "value" $eq oldValue)
     val doc = MongoDBObject("_id" -> itemKey, "value" -> newValue)
-    update(newValue, filter, doc)
+    update(newValue, filter, doc) == 1
   }
 
-  private def update(newValue: String, filter: Imports.DBObject, doc: commons.Imports.DBObject): Boolean = {
+  private def update(newValue: String, filter: Imports.DBObject, doc: commons.Imports.DBObject): Int = {
     val result = collection.update(filter, doc, upsert = false, multi = false)
-    val wroteExactly1 = result.wasAcknowledged() && result.getN == 1
-    logOutcome(newValue, wroteExactly1, result.isUpdateOfExisting)
-    wroteExactly1
+    val n = if (result.wasAcknowledged()) result.getN else 0
+    logOutcome(newValue, n == 1, result.isUpdateOfExisting)
+    n
   }
 
   private def logOutcome(value: String, wroteExactly1: Boolean, isUpdateOfExisting: Boolean) {
