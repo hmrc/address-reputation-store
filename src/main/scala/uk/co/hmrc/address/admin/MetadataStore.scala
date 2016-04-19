@@ -28,8 +28,3 @@ class MetadataStore(mongoDbConnection: CasbahMongoConnection, logger: SimpleLogg
   val gbAddressBaseCollectionName = new MongoStoredMetadataItem(adminCollection, "gbAddressBaseCollectionName", "addressbase", logger)
   val niAddressBaseCollectionName = new MongoStoredMetadataItem(adminCollection, "niAddressBaseCollectionName", "addressbase_ni", logger)
 }
-
-
-trait StoredMetadataItem {
-  def get: String
-}

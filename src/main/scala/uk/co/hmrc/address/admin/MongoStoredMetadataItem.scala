@@ -23,7 +23,9 @@ import com.mongodb.casbah.commons.MongoDBObject
 import com.mongodb.casbah.query.Imports
 import uk.co.hmrc.logging.SimpleLogger
 
-class MongoStoredMetadataItem(collection: MongoCollection, itemKey: String, initialValue: String, logger: SimpleLogger) extends StoredMetadataItem {
+class MongoStoredMetadataItem(collection: MongoCollection, itemKey: String, initialValue: String, logger: SimpleLogger)
+  extends StoredMetadataItem with AtomicLock {
+
   initialise()
 
   def initialise() = {
@@ -44,7 +46,7 @@ class MongoStoredMetadataItem(collection: MongoCollection, itemKey: String, init
   /**
     * Sets key/value item to a new value.
     */
-  def set(newValue: String): Int = {
+  def set(newValue: String) {
     val filter = "_id" $eq itemKey
     val doc = MongoDBObject("_id" -> itemKey, "value" -> newValue)
     update(initialValue, filter, doc)
