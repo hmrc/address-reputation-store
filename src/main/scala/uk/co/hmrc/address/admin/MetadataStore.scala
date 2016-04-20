@@ -21,10 +21,19 @@ import uk.co.hmrc.address.services.mongo.CasbahMongoConnection
 import uk.co.hmrc.logging.SimpleLogger
 
 
+object MetadataStore {
+  val adminCollectionName = "admin"
+  val gbAddressMetadataItemName = "gbAddressBaseCollectionName"
+  val niAddressMetadataItemName = "niAddressBaseCollectionName"
+}
+
+
 class MetadataStore(mongoDbConnection: CasbahMongoConnection, logger: SimpleLogger) {
 
-  val adminCollection: MongoCollection = mongoDbConnection.getConfiguredDb("admin")
+  import MetadataStore._
 
-  val gbAddressBaseCollectionName = new MongoStoredMetadataItem(adminCollection, "gbAddressBaseCollectionName", "addressbase", logger)
-  val niAddressBaseCollectionName = new MongoStoredMetadataItem(adminCollection, "niAddressBaseCollectionName", "addressbase_ni", logger)
+  val adminCollection: MongoCollection = mongoDbConnection.getConfiguredDb(adminCollectionName)
+
+  val gbAddressBaseCollectionName = new MongoStoredMetadataItem(adminCollection, gbAddressMetadataItemName, "addressbase", logger)
+  val niAddressBaseCollectionName = new MongoStoredMetadataItem(adminCollection, niAddressMetadataItemName, "addressbase_ni", logger)
 }
