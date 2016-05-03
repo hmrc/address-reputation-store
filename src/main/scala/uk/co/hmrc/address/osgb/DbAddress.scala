@@ -41,15 +41,6 @@ case class DbAddress(id: String, lines: List[String], town: String, postcode: St
   def toSeq: Seq[String] = Seq(id, line1, line2, line3, town, postcode)
 
   def splitPostcode = Postcode(postcode)
-
-  def mongoDBObject: DBObject = {
-    MongoDBObject(
-      "_id" -> id,
-      "lines" -> lines,
-      "town" -> town,
-      "postcode" -> postcode
-    )
-  }
 }
 
 
