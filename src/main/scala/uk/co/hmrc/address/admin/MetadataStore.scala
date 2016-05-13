@@ -23,8 +23,8 @@ import uk.co.hmrc.logging.SimpleLogger
 
 object MetadataStore {
   val adminCollectionName = "admin"
-  val gbAddressMetadataItemName = "gbAddressBaseCollectionName"
-  val niAddressMetadataItemName = "niAddressBaseCollectionName"
+  val gbAddressMetadataItemName = "abp_collection_name"
+  val niAddressMetadataItemName = "abi_collection_name"
 }
 
 
