@@ -36,7 +36,7 @@ class MongoStoredMetadataItem(collection: MongoCollection, itemKey: String, init
     try {
       val result = collection.insert(doc)
       val wroteExactly1 = result.wasAcknowledged() && result.getN == 1
-      logOutcome("", wroteExactly1, result.isUpdateOfExisting)
+      logOutcome(initialValue, wroteExactly1, result.isUpdateOfExisting)
     } catch {
       case dk: DuplicateKeyException =>
         logger.info(s"At startup, MongoDB.admin already contained $itemKey.")
@@ -49,7 +49,7 @@ class MongoStoredMetadataItem(collection: MongoCollection, itemKey: String, init
   def set(newValue: String) {
     val filter = "_id" $eq itemKey
     val doc = MongoDBObject("_id" -> itemKey, "value" -> newValue)
-    update(initialValue, filter, doc)
+    update(newValue, filter, doc)
   }
 
   /**
