@@ -51,37 +51,37 @@ class StubLogger(echo: Boolean = false) extends SimpleLogger {
   def info(format: String, arguments: AnyRef*) {
     val entry = LogEntry("Info:" + format, arguments.toSeq, None)
     _infos.add(entry)
-    if (echo) println(entry)
+    if (echo) entry.dump()
   }
 
   def info(msg: String, t: Throwable) {
     val entry = LogEntry("Info:" + msg, Seq(), Some(t))
     _infos.add(entry)
-    if (echo) println(entry)
+    if (echo) entry.dump()
   }
 
   def warn(format: String, arguments: AnyRef*) {
     val entry = LogEntry("Warn:" + format, arguments.toSeq, None)
     _warns.add(entry)
-    if (echo) println(entry)
+    if (echo) entry.dump()
   }
 
   def warn(msg: String, t: Throwable) {
     val entry = LogEntry("Warn:" + msg, Seq(), Some(t))
     _warns.add(entry)
-    if (echo) println(entry)
+    if (echo) entry.dump()
   }
 
   def error(format: String, arguments: AnyRef*) {
     val entry = LogEntry("Error:" + format, arguments.toSeq, None)
     _errors.add(entry)
-    if (echo) println(entry)
+    if (echo) entry.dump()
   }
 
   def error(msg: String, t: Throwable) {
     val entry = LogEntry("Error:" + msg, Seq(), Some(t))
     _errors.add(entry)
-    if (echo) println(entry)
+    if (echo) entry.dump()
   }
 
 }
@@ -89,5 +89,15 @@ class StubLogger(echo: Boolean = false) extends SimpleLogger {
 case class LogEntry(message: String, args: Seq[AnyRef], throwable: Option[Throwable]) {
   override def toString: String = {
     s"$message| args:$args; th:$throwable"
+  }
+
+  def dump() {
+    println(toString)
+    if (throwable.isDefined) {
+      throwable.get match {
+        case e: Exception => e.printStackTrace(System.out)
+        case _ =>
+      }
+    }
   }
 }
