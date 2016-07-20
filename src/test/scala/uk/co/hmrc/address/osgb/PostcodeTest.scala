@@ -82,4 +82,8 @@ class PostcodeTest extends FunSuite {
   test("toString") {
     assert(Postcode("SK9 1AZ").toString === "SK9 1AZ")
   }
+
+  test("urlSafe") {
+    assert(Postcode("SK9 1AZ").urlSafe === "SK9+1AZ")
+  }
 }

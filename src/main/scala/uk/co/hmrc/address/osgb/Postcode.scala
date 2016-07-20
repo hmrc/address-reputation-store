@@ -23,6 +23,8 @@ case class Postcode(area: String, district: String, sector: String, unit: String
 
   def incode = sector + unit
 
+  def urlSafe = outcode + "+" + incode
+
   override lazy val toString = outcode + " " + incode
 }
 
