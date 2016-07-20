@@ -42,7 +42,7 @@ private object AppDependencies {
 
   val compile = Seq(
     //NOTE: 0.11.6 Netty 3.10.4.Final clashes with Play (2.3.10) version of Netty 3.9.8
-    "org.reactivemongo" %% "reactivemongo" % "0.11.5" withSources(),
+    "uk.gov.hmrc" %% "reactivemongo" % "0.11.8" withSources(),
     "com.univocity" % "univocity-parsers" % "1.5.6" withSources(),
     "org.mongodb" %% "casbah" % "3.1.1"
   )
