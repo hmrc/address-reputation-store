@@ -39,10 +39,13 @@ object HmrcBuild extends Build {
 private object AppDependencies {
 
   // Important note: Play is *not* a dependency here, nor is it a transitive dependency.
+  val reactiveMongoVersion = "0.11.8"
 
   val compile = Seq(
     //NOTE: 0.11.6 Netty 3.10.4.Final clashes with Play (2.3.10) version of Netty 3.9.8
-    "uk.gov.hmrc" %% "reactivemongo" % "0.11.8" withSources(),
+    "uk.gov.hmrc" %% "reactivemongo" % reactiveMongoVersion withSources(),
+    "uk.gov.hmrc" %% "reactivemongo-bson" % reactiveMongoVersion withSources(),
+    "uk.gov.hmrc" %% "reactivemongo-bson-macros" % reactiveMongoVersion withSources(),
     "com.univocity" % "univocity-parsers" % "1.5.6" withSources(),
     "org.mongodb" %% "casbah" % "3.1.1"
   )

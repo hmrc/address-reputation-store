@@ -22,12 +22,22 @@ import reactivemongo.bson.BSONDocument
 import scala.concurrent.{ExecutionContext, Future}
 
 
+case class CollectionMetadata(name: String, count: Int)
+
+
 trait MongoSearcher[T] {
+  def metadata: Future[CollectionMetadata]
+
   def mongoSearch(selector: BSONDocument, fn: BSONDocument => T): Future[List[T]]
 }
 
 
 class SwitchableMongoSearcher[T](collectionProvider: CollectionProvider)(implicit ec: ExecutionContext) extends MongoSearcher[T] {
+
+  def metadata: Future[CollectionMetadata] = {
+    val stats = collectionProvider.collection.stats
+    stats.map(s => CollectionMetadata(s.ns, s.count))
+  }
 
   def mongoSearch(selector: BSONDocument, fn: BSONDocument => T): Future[List[T]] = {
     import scala.language.implicitConversions
