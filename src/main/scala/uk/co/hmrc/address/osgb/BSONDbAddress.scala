@@ -25,10 +25,10 @@ object BSONDbAddress extends BSONDocumentReader[DbAddress] {
     val lines = bson.getAs[List[String]]("lines")
     val town = bson.getAs[String]("town").getOrElse("")
     val postcode = bson.getAs[String]("postcode")
-    val subCountry = bson.getAs[String]("subCountry").getOrElse("")
+    val subdivision = bson.getAs[String]("subdivision").getOrElse("")
 
     if (lines.isDefined) {
-      new DbAddress(id.get, lines.get, town, postcode.get, subCountry)
+      new DbAddress(id.get, lines.get, town, postcode.get, subdivision)
 
     } else {
       // backward compatibility
@@ -37,7 +37,7 @@ object BSONDbAddress extends BSONDocumentReader[DbAddress] {
       val line1 = bson.getAs[String]("line1").getOrElse("")
       val line2 = bson.getAs[String]("line2").getOrElse("")
       val line3 = bson.getAs[String]("line3").getOrElse("")
-      DbAddress(id2, line1, line2, line3, town, postcode.get, subCountry)
+      DbAddress(id2, line1, line2, line3, town, postcode.get, subdivision)
     }
   }
 }

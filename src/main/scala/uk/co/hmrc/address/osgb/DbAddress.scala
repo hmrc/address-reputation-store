@@ -25,7 +25,7 @@ trait Document {
 }
 
 // id typically consists of some prefix and the uprn
-case class DbAddress(id: String, lines: List[String], town: String, postcode: String, subCountry: String) extends Document {
+case class DbAddress(id: String, lines: List[String], town: String, postcode: String, subdivision: String) extends Document {
 
   def linesContainIgnoreCase(filterStr: String): Boolean = {
     val filter = filterStr.toUpperCase
@@ -39,11 +39,11 @@ case class DbAddress(id: String, lines: List[String], town: String, postcode: St
   def line3 = if (lines.size > 2) lines(2) else ""
 
   // For use as input to MongoDbObject (hence it's not a Map)
-  def tupled = List("_id" -> id, "lines" -> lines, "town" -> town, "postcode" -> postcode, "subCountry" -> subCountry)
+  def tupled = List("_id" -> id, "lines" -> lines, "town" -> town, "postcode" -> postcode, "subdivision" -> subdivision)
 
   // For use as input to CSV generation etc.
   // Could instead use `this.productIterator.map(_.toString).toSeq`, but this is simpler.
-  def toSeq: Seq[String] = Seq(id, line1, line2, line3, town, postcode, subCountry)
+  def toSeq: Seq[String] = Seq(id, line1, line2, line3, town, postcode, subdivision)
 
   def splitPostcode = Postcode(postcode)
 
@@ -53,24 +53,24 @@ case class DbAddress(id: String, lines: List[String], town: String, postcode: St
 
 object DbAddress {
 
-  def apply(id: String, line1: String, line2: String, line3: String, town: String, postcode: String, subCountry: String): DbAddress = {
-    apply(id, List(line1, line2, line3).filterNot(_ == ""), town, postcode, subCountry)
+  def apply(id: String, line1: String, line2: String, line3: String, town: String, postcode: String, subdivision: String): DbAddress = {
+    apply(id, List(line1, line2, line3).filterNot(_ == ""), town, postcode, subdivision)
   }
 
   def apply(o: MongoDBObject): DbAddress = {
     val id = o.as[String]("_id")
     val town = o.as[String]("town")
     val postcode = o.as[String]("postcode")
-    val subCountry = if (o.containsField("subCountry")) o.as[String]("subCountry") else ""
+    val subdivision = if (o.containsField("subdivision")) o.as[String]("subdivision") else ""
     if (o.containsField("lines")) {
       val lines = o.as[List[String]]("lines")
-      new DbAddress(id, lines, town, postcode, subCountry)
+      new DbAddress(id, lines, town, postcode, subdivision)
     } else {
       // backward compatibility
       val line1 = o.as[String]("line1")
       val line2 = o.as[String]("line2")
       val line3 = o.as[String]("line3")
-      DbAddress(id, line1, line2, line3, town, postcode, subCountry)
+      DbAddress(id, line1, line2, line3, town, postcode, subdivision)
     }
   }
 

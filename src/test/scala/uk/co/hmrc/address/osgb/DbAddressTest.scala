@@ -48,7 +48,7 @@ class DbAddressTest extends FunSuite {
   }
 
   test("tupled") {
-    assert(a.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "subCountry" -> "GB-ENG"))
+    assert(a.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "subdivision" -> "GB-ENG"))
   }
 
   test("toSeq") {
