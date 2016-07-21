@@ -20,7 +20,7 @@ import org.scalatest.FunSuite
 
 class DbAddressTest extends FunSuite {
 
-  val a = DbAddress("GB47070784", "Line1", "Line2", "Line3", "Tynemouth", "NE30 4HG")
+  val a = DbAddress("GB47070784", "Line1", "Line2", "Line3", "Tynemouth", "NE30 4HG", "GB-ENG")
 
   test("linesContainIgnoreCase - check we can find a match in line1, case insensitive") {
     assert(a.linesContainIgnoreCase("e1") === true)
@@ -42,17 +42,17 @@ class DbAddressTest extends FunSuite {
   }
 
   test("lines") {
-    assert(DbAddress("GB47070784", "Line1", "Line2", "Line3", "Tynemouth", "NE30 4HG").lines === List("Line1", "Line2", "Line3"))
-    assert(DbAddress("GB47070784", "Line1", "Line2", "", "Tynemouth", "NE30 4HG").lines === List("Line1", "Line2"))
-    assert(DbAddress("GB47070784", "Line1", "", "", "Tynemouth", "NE30 4HG").lines === List("Line1"))
+    assert(DbAddress("GB47070784", "Line1", "Line2", "Line3", "Tynemouth", "NE30 4HG", "GB-ENG").lines === List("Line1", "Line2", "Line3"))
+    assert(DbAddress("GB47070784", "Line1", "Line2", "", "Tynemouth", "NE30 4HG", "GB-ENG").lines === List("Line1", "Line2"))
+    assert(DbAddress("GB47070784", "Line1", "", "", "Tynemouth", "NE30 4HG", "GB-ENG").lines === List("Line1"))
   }
 
   test("tupled") {
-    assert(a.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG"))
+    assert(a.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "subdivision" -> "GB-ENG"))
   }
 
   test("toSeq") {
-    assert(a.toSeq === Seq("GB47070784", "Line1", "Line2", "Line3", "Tynemouth", "NE30 4HG"))
+    assert(a.toSeq === Seq("GB47070784", "Line1", "Line2", "Line3", "Tynemouth", "NE30 4HG", "GB-ENG"))
   }
 
   test("splitPostcode") {
