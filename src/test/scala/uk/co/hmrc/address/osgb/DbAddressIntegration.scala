@@ -24,12 +24,11 @@ import uk.co.hmrc.helper.EmbeddedMongoSuite
 
 class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
 
-  val a1 = DbAddress("GB47070784", "A1", "Line2", "Line3", "Tynemouth", "NE30 4HG", "GB-ENG")
-  val a2 = DbAddress("GB47070785", "A2", "Line2", "Line3", "Tynemouth", "NE30 4HG", "GB-ENG")
+  val a1 = DbAddress("GB47070784", "A1", "Line2", "Line3", Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"))
+  val a2 = DbAddress("GB47070785", "A2", "Line2", "Line3", Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"))
 
   def casbahFixtures(m: DBObject*) = {
-    val mongoConnection = casbahMongoConnection()
-    val collection = mongoConnection.getConfiguredDb("address")
+    val collection = casbahMongoConnection.getConfiguredDb("address")
     collection.drop()
 
     for (x <- m) {
@@ -69,9 +68,9 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
   test("read (only) using ReactiveMongo") {
     val id = BSONString(a1.id)
     val lines = BSONArray(a1.lines.map(s => BSONString(s)))
-    val town = BSONString(a1.town)
+    val town = BSONString(a1.town.get)
     val postcode = BSONString(a1.postcode)
-    val subdivision = BSONString(a1.subdivision)
+    val subdivision = BSONString(a1.subdivision.get)
     val bson = BSONDocument("_id" -> id, "lines" -> lines, "town" -> town, "postcode" -> postcode, "subdivision" -> subdivision)
     val r = BSONDbAddress.read(bson)
 
@@ -83,9 +82,9 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
     val line1 = BSONString(a1.line1)
     val line2 = BSONString(a1.line2)
     val line3 = BSONString(a1.line3)
-    val town = BSONString(a1.town)
+    val town = BSONString(a1.town.get)
     val postcode = BSONString(a1.postcode)
-    val subdivision = BSONString(a1.subdivision)
+    val subdivision = BSONString(a1.subdivision.get)
     val bson = BSONDocument("_id" -> id, "line1" -> line1, "line2" -> line2, "line3" -> line3, "town" -> town, "postcode" -> postcode, "subdivision" -> subdivision)
     val r = BSONDbAddress.read(bson)
 
@@ -95,21 +94,21 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
   test("read (only) using ReactiveMongo - old representation using line1,line2,line3 - empty case, prefix") {
     val uprn = BSONString("47070784")
     val postcode = BSONString(a1.postcode)
-    val subdivision = BSONString(a1.subdivision)
+    val subdivision = BSONString(a1.subdivision.get)
     val bson = BSONDocument("uprn" -> uprn, "postcode" -> postcode, "subdivision" -> subdivision)
     val r = BSONDbAddress.read(bson)
 
-    assert(r === new DbAddress("GB47070784", Nil, "", "NE30 4HG", "GB-ENG"))
+    assert(r === new DbAddress("GB47070784", Nil, None, "NE30 4HG", Some("GB-ENG")))
   }
 
   test("read (only) using ReactiveMongo - old representation using line1,line2,line3 - empty case, no prefix") {
     val uprn = BSONString("GB47070784")
     val postcode = BSONString(a1.postcode)
-    val subdivision = BSONString(a1.subdivision)
+    val subdivision = BSONString(a1.subdivision.get)
     val bson = BSONDocument("uprn" -> uprn, "postcode" -> postcode, "subdivision" -> subdivision)
     val r = BSONDbAddress.read(bson)
 
-    assert(r === new DbAddress("GB47070784", Nil, "", "NE30 4HG", "GB-ENG"))
+    assert(r === new DbAddress("GB47070784", Nil, None, "NE30 4HG", Some("GB-ENG")))
   }
 
 }

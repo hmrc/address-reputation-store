@@ -29,8 +29,7 @@ class MetadataStoreTest extends WordSpec with EmbeddedMongoSuite {
            2. allow the value to be changed
       """ in {
         val logger = new StubLogger(true)
-        val mongoConnection = casbahMongoConnection()
-        val collection = mongoConnection.getConfiguredDb("admin")
+        val collection = casbahMongoConnection.getConfiguredDb("admin")
         collection.drop()
 
         val keyValue = new MongoStoredMetadataItem(collection, "keyValue", "started", logger)
@@ -70,8 +69,7 @@ class MetadataStoreTest extends WordSpec with EmbeddedMongoSuite {
            3. allow the lock to be released
       """ in {
         val logger = new StubLogger(true)
-        val mongoConnection = casbahMongoConnection()
-        val collection = mongoConnection.getConfiguredDb("admin")
+        val collection = casbahMongoConnection.getConfiguredDb("admin")
         collection.drop()
 
         val dLock = new MongoStoredMetadataItem(collection, "dLock", "started", logger)

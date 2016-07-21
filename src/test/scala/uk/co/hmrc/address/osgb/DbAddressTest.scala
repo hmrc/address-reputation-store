@@ -20,42 +20,48 @@ import org.scalatest.FunSuite
 
 class DbAddressTest extends FunSuite {
 
-  val a = DbAddress("GB47070784", "Line1", "Line2", "Line3", "Tynemouth", "NE30 4HG", "GB-ENG")
+  val a1 = DbAddress("GB47070784", "Line1", "Line2", "Line3", Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"))
+  val a2 = DbAddress("GB47070784", "Line1", "Line2", "Line3", Some("Tynemouth"), "NE30 4HG", None)
+  val a4 = DbAddress("GB47070784", "Line1", "Line2", "Line3", None, "NE30 4HG", None)
 
   test("linesContainIgnoreCase - check we can find a match in line1, case insensitive") {
-    assert(a.linesContainIgnoreCase("e1") === true)
-    assert(a.linesContainIgnoreCase("E1") === true)
+    assert(a1.linesContainIgnoreCase("e1") === true)
+    assert(a1.linesContainIgnoreCase("E1") === true)
   }
 
   test("linesContainIgnoreCase - check we can find a match in line2, case insensitive") {
-    assert(a.linesContainIgnoreCase("e2") === true)
-    assert(a.linesContainIgnoreCase("E2") === true)
+    assert(a1.linesContainIgnoreCase("e2") === true)
+    assert(a1.linesContainIgnoreCase("E2") === true)
   }
 
   test("linesContainIgnoreCase - check we can find a match in line3, case insensitive") {
-    assert(a.linesContainIgnoreCase("e3") === true)
-    assert(a.linesContainIgnoreCase("E3") === true)
+    assert(a1.linesContainIgnoreCase("e3") === true)
+    assert(a1.linesContainIgnoreCase("E3") === true)
   }
 
   test("linesContainIgnoreCase - unmatched string should lead to the address being rejected") {
-    assert(a.linesContainIgnoreCase("SOMETHING") === false)
+    assert(a1.linesContainIgnoreCase("SOMETHING") === false)
   }
 
   test("lines") {
-    assert(DbAddress("GB47070784", "Line1", "Line2", "Line3", "Tynemouth", "NE30 4HG", "GB-ENG").lines === List("Line1", "Line2", "Line3"))
-    assert(DbAddress("GB47070784", "Line1", "Line2", "", "Tynemouth", "NE30 4HG", "GB-ENG").lines === List("Line1", "Line2"))
-    assert(DbAddress("GB47070784", "Line1", "", "", "Tynemouth", "NE30 4HG", "GB-ENG").lines === List("Line1"))
+    assert(DbAddress("GB47070784", "Line1", "Line2", "Line3", Some("Tynemouth"), "NE30 4HG", Some("GB-ENG")).lines === List("Line1", "Line2", "Line3"))
+    assert(DbAddress("GB47070784", "Line1", "Line2", "", Some("Tynemouth"), "NE30 4HG", Some("GB-ENG")).lines === List("Line1", "Line2"))
+    assert(DbAddress("GB47070784", "Line1", "", "", Some("Tynemouth"), "NE30 4HG", Some("GB-ENG")).lines === List("Line1"))
   }
 
   test("tupled") {
-    assert(a.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "subdivision" -> "GB-ENG"))
+    assert(a1.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "subdivision" -> "GB-ENG"))
+    assert(a2.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG"))
+    assert(a4.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "postcode" -> "NE30 4HG"))
   }
 
   test("toSeq") {
-    assert(a.toSeq === Seq("GB47070784", "Line1", "Line2", "Line3", "Tynemouth", "NE30 4HG", "GB-ENG"))
+    assert(a1.toSeq === Seq("GB47070784", "Line1", "Line2", "Line3", "Tynemouth", "NE30 4HG", "GB-ENG"))
+    assert(a2.toSeq === Seq("GB47070784", "Line1", "Line2", "Line3", "Tynemouth", "NE30 4HG"))
+    assert(a4.toSeq === Seq("GB47070784", "Line1", "Line2", "Line3", "NE30 4HG"))
   }
 
   test("splitPostcode") {
-    assert(a.splitPostcode === Postcode("NE", "30", "4", "HG"))
+    assert(a1.splitPostcode === Postcode("NE", "30", "4", "HG"))
   }
 }

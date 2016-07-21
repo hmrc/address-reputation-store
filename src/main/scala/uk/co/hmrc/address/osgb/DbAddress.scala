@@ -24,8 +24,13 @@ trait Document {
   def normalise: Document
 }
 
+/**
+  * Address typically represents a postal address.
+  * For UK addresses, 'town' will always be present.
+  * For non-UK addresses, 'town' may be absent and there may be an extra line instead.
+  */
 // id typically consists of some prefix and the uprn
-case class DbAddress(id: String, lines: List[String], town: String, postcode: String, subdivision: String) extends Document {
+case class DbAddress(id: String, lines: List[String], town: Option[String], postcode: String, subdivision: Option[String]) extends Document {
 
   def linesContainIgnoreCase(filterStr: String): Boolean = {
     val filter = filterStr.toUpperCase
@@ -39,11 +44,11 @@ case class DbAddress(id: String, lines: List[String], town: String, postcode: St
   def line3 = if (lines.size > 2) lines(2) else ""
 
   // For use as input to MongoDbObject (hence it's not a Map)
-  def tupled = List("_id" -> id, "lines" -> lines, "town" -> town, "postcode" -> postcode, "subdivision" -> subdivision)
+  def tupled = List("_id" -> id, "lines" -> lines) ++ town.map("town" -> _) ++ List("postcode" -> postcode) ++ subdivision.map("subdivision" -> _)
 
   // For use as input to CSV generation etc.
   // Could instead use `this.productIterator.map(_.toString).toSeq`, but this is simpler.
-  def toSeq: Seq[String] = Seq(id, line1, line2, line3, town, postcode, subdivision)
+  def toSeq: Seq[String] = Seq(id, line1, line2, line3) ++ town ++ Seq(postcode) ++ subdivision
 
   def splitPostcode = Postcode(postcode)
 
@@ -53,15 +58,15 @@ case class DbAddress(id: String, lines: List[String], town: String, postcode: St
 
 object DbAddress {
 
-  def apply(id: String, line1: String, line2: String, line3: String, town: String, postcode: String, subdivision: String): DbAddress = {
+  def apply(id: String, line1: String, line2: String, line3: String, town: Option[String], postcode: String, subdivision: Option[String]): DbAddress = {
     apply(id, List(line1, line2, line3).filterNot(_ == ""), town, postcode, subdivision)
   }
 
   def apply(o: MongoDBObject): DbAddress = {
     val id = o.as[String]("_id")
-    val town = o.as[String]("town")
+    val town = if (o.containsField("town")) Some(o.as[String]("town")) else None
     val postcode = o.as[String]("postcode")
-    val subdivision = if (o.containsField("subdivision")) o.as[String]("subdivision") else ""
+    val subdivision = if (o.containsField("subdivision")) Some(o.as[String]("subdivision")) else None
     if (o.containsField("lines")) {
       val lines = o.as[List[String]]("lines")
       new DbAddress(id, lines, town, postcode, subdivision)

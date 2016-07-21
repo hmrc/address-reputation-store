@@ -55,11 +55,13 @@ trait EmbeddedMongoSuite extends Suite {
       status
     }
     finally {
+      casbahMongoConnection.close()
+      Thread.sleep(500)
       EmbeddedMongoSuite.stop()
     }
   }
 
   def mongoTestConnection = EmbeddedMongoSuite.mongoTestConnection
 
-  def casbahMongoConnection() = new CasbahMongoConnection(mongoTestConnection.uri)
+  lazy val casbahMongoConnection = new CasbahMongoConnection(mongoTestConnection.uri)
 }
