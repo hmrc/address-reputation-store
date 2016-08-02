@@ -18,6 +18,8 @@ package uk.co.hmrc.address.osgb
 
 import com.mongodb.casbah.commons.MongoDBObject
 
+import scala.annotation.tailrec
+
 trait Document {
   def tupled: List[(String, Any)]
 
@@ -32,7 +34,8 @@ trait Document {
 // id typically consists of some prefix and the uprn
 case class DbAddress(id: String, lines: List[String], town: Option[String], postcode: String, subdivision: Option[String]) extends Document {
 
-  def uprn: String = if (id.startsWith("GB")) id.substring(2) else id
+  // UPRN is specified to be an integer of up to 12 digits (it can also be assumed to be always positive)
+  def uprn: Long = DbAddress.trimLeadingLetters(id).toLong
 
   def linesContainIgnoreCase(filterStr: String): Boolean = {
     val filter = filterStr.toUpperCase
@@ -77,4 +80,9 @@ object DbAddress {
     }
   }
 
+  @tailrec
+  private[osgb] def trimLeadingLetters(id: String): String = {
+    if (id.isEmpty || Character.isDigit(id.head)) id
+    else trimLeadingLetters(id.tail)
+  }
 }

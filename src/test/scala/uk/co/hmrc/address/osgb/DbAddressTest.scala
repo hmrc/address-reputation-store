@@ -56,9 +56,9 @@ class DbAddressTest extends FunSuite {
   }
 
   test("uprn") {
-    assert(a1.uprn === "47070784")
-    assert(a2.uprn === "47070784")
-    assert(a4.uprn === "47070784")
+    assert(a1.uprn === 47070784L)
+    assert(a2.uprn === 47070784L)
+    assert(a4.uprn === 47070784L)
   }
 
   test("splitPostcode") {
