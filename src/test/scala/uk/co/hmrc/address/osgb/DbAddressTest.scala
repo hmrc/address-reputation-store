@@ -55,10 +55,10 @@ class DbAddressTest extends FunSuite {
     assert(a4.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "postcode" -> "NE30 4HG"))
   }
 
-  test("toSeq") {
-    assert(a1.toSeq === Seq("GB47070784", "Line1", "Line2", "Line3", "Tynemouth", "NE30 4HG", "GB-ENG"))
-    assert(a2.toSeq === Seq("GB47070784", "Line1", "Line2", "Line3", "Tynemouth", "NE30 4HG"))
-    assert(a4.toSeq === Seq("GB47070784", "Line1", "Line2", "Line3", "NE30 4HG"))
+  test("uprn") {
+    assert(a1.uprn === "47070784")
+    assert(a2.uprn === "47070784")
+    assert(a4.uprn === "47070784")
   }
 
   test("splitPostcode") {

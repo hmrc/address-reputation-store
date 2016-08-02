@@ -32,6 +32,8 @@ trait Document {
 // id typically consists of some prefix and the uprn
 case class DbAddress(id: String, lines: List[String], town: Option[String], postcode: String, subdivision: Option[String]) extends Document {
 
+  def uprn: String = if (id.startsWith("GB")) id.substring(2) else id
+
   def linesContainIgnoreCase(filterStr: String): Boolean = {
     val filter = filterStr.toUpperCase
     lines.map(_.toUpperCase).exists(_.contains(filter))
@@ -45,10 +47,6 @@ case class DbAddress(id: String, lines: List[String], town: Option[String], post
 
   // For use as input to MongoDbObject (hence it's not a Map)
   def tupled = List("_id" -> id, "lines" -> lines) ++ town.map("town" -> _) ++ List("postcode" -> postcode) ++ subdivision.map("subdivision" -> _)
-
-  // For use as input to CSV generation etc.
-  // Could instead use `this.productIterator.map(_.toString).toSeq`, but this is simpler.
-  def toSeq: Seq[String] = Seq(id, line1, line2, line3) ++ town ++ Seq(postcode) ++ subdivision
 
   def splitPostcode = Postcode(postcode)
 
