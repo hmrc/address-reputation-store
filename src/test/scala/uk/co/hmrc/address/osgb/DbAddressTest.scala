@@ -20,9 +20,9 @@ import org.scalatest.FunSuite
 
 class DbAddressTest extends FunSuite {
 
-  val a1 = DbAddress("GB47070784", "Line1", "Line2", "Line3", Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"))
-  val a2 = DbAddress("GB47070784", "Line1", "Line2", "Line3", Some("Tynemouth"), "NE30 4HG", None)
-  val a4 = DbAddress("GB47070784", "Line1", "Line2", "Line3", None, "NE30 4HG", None)
+  val a1 = DbAddress("GB47070784", "Line1", "Line2", "Line3", Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some(1234))
+  val a2 = DbAddress("GB47070784", "Line1", "Line2", "Line3", Some("Tynemouth"), "NE30 4HG", None, Some(1234))
+  val a4 = DbAddress("GB47070784", "Line1", "Line2", "Line3", None, "NE30 4HG", None, None)
 
   test("linesContainIgnoreCase - check we can find a match in line1, case insensitive") {
     assert(a1.linesContainIgnoreCase("e1") === true)
@@ -44,14 +44,14 @@ class DbAddressTest extends FunSuite {
   }
 
   test("lines") {
-    assert(DbAddress("GB47070784", "Line1", "Line2", "Line3", Some("Tynemouth"), "NE30 4HG", Some("GB-ENG")).lines === List("Line1", "Line2", "Line3"))
-    assert(DbAddress("GB47070784", "Line1", "Line2", "", Some("Tynemouth"), "NE30 4HG", Some("GB-ENG")).lines === List("Line1", "Line2"))
-    assert(DbAddress("GB47070784", "Line1", "", "", Some("Tynemouth"), "NE30 4HG", Some("GB-ENG")).lines === List("Line1"))
+    assert(DbAddress("GB47070784", "Line1", "Line2", "Line3", Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some(1234)).lines === List("Line1", "Line2", "Line3"))
+    assert(DbAddress("GB47070784", "Line1", "Line2", "", Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some(1234)).lines === List("Line1", "Line2"))
+    assert(DbAddress("GB47070784", "Line1", "", "", Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), None).lines === List("Line1"))
   }
 
   test("tupled") {
-    assert(a1.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "subdivision" -> "GB-ENG"))
-    assert(a2.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG"))
+    assert(a1.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "subdivision" -> "GB-ENG", "localCustodianCode" -> 1234))
+    assert(a2.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "localCustodianCode" -> 1234))
     assert(a4.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "postcode" -> "NE30 4HG"))
   }
 

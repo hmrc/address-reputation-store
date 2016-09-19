@@ -26,18 +26,8 @@ object BSONDbAddress extends BSONDocumentReader[DbAddress] {
     val town = bson.getAs[String]("town")
     val postcode = bson.getAs[String]("postcode")
     val subdivision = bson.getAs[String]("subdivision")
+    val localCustodianCode = bson.getAs[Int]("localCustodianCode")
 
-    if (lines.isDefined) {
-      new DbAddress(id.get, lines.get, town, postcode.get, subdivision)
-
-    } else {
-      // backward compatibility
-      val uprn = (bson.getAs[String]("uprn") orElse id).get
-      val id2 = if (uprn.startsWith("GB")) uprn else "GB" + uprn
-      val line1 = bson.getAs[String]("line1").getOrElse("")
-      val line2 = bson.getAs[String]("line2").getOrElse("")
-      val line3 = bson.getAs[String]("line3").getOrElse("")
-      DbAddress(id2, line1, line2, line3, town, postcode.get, subdivision)
-    }
+    new DbAddress(id.get, lines.get, town, postcode.get, subdivision, localCustodianCode)
   }
 }

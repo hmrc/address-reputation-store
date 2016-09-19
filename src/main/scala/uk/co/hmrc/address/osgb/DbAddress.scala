@@ -32,7 +32,7 @@ trait Document {
   * For non-UK addresses, 'town' may be absent and there may be an extra line instead.
   */
 // id typically consists of some prefix and the uprn
-case class DbAddress(id: String, lines: List[String], town: Option[String], postcode: String, subdivision: Option[String]) extends Document {
+case class DbAddress(id: String, lines: List[String], town: Option[String], postcode: String, subdivision: Option[String], localCustodianCode: Option[Int]) extends Document {
 
   // UPRN is specified to be an integer of up to 12 digits (it can also be assumed to be always positive)
   def uprn: Long = DbAddress.trimLeadingLetters(id).toLong
@@ -49,7 +49,11 @@ case class DbAddress(id: String, lines: List[String], town: Option[String], post
   def line3 = if (lines.size > 2) lines(2) else ""
 
   // For use as input to MongoDbObject (hence it's not a Map)
-  def tupled = List("_id" -> id, "lines" -> lines) ++ town.map("town" -> _) ++ List("postcode" -> postcode) ++ subdivision.map("subdivision" -> _)
+  def tupled = List("_id" -> id, "lines" -> lines) ++
+    town.map("town" -> _) ++
+    List("postcode" -> postcode) ++
+    subdivision.map("subdivision" -> _) ++
+    localCustodianCode.map("localCustodianCode" -> _)
 
   def splitPostcode = Postcode(postcode)
 
@@ -59,8 +63,8 @@ case class DbAddress(id: String, lines: List[String], town: Option[String], post
 
 object DbAddress {
 
-  def apply(id: String, line1: String, line2: String, line3: String, town: Option[String], postcode: String, subdivision: Option[String]): DbAddress = {
-    apply(id, List(line1, line2, line3).filterNot(_ == ""), town, postcode, subdivision)
+  def apply(id: String, line1: String, line2: String, line3: String, town: Option[String], postcode: String, subdivision: Option[String], localCustodianCode: Option[Int]): DbAddress = {
+    apply(id, List(line1, line2, line3).filterNot(_ == ""), town, postcode, subdivision, localCustodianCode)
   }
 
   def apply(o: MongoDBObject): DbAddress = {
@@ -68,16 +72,9 @@ object DbAddress {
     val town = if (o.containsField("town")) Some(o.as[String]("town")) else None
     val postcode = o.as[String]("postcode")
     val subdivision = if (o.containsField("subdivision")) Some(o.as[String]("subdivision")) else None
-    if (o.containsField("lines")) {
-      val lines = o.as[List[String]]("lines")
-      new DbAddress(id, lines, town, postcode, subdivision)
-    } else {
-      // backward compatibility
-      val line1 = o.as[String]("line1")
-      val line2 = o.as[String]("line2")
-      val line3 = o.as[String]("line3")
-      DbAddress(id, line1, line2, line3, town, postcode, subdivision)
-    }
+    val localCustodianCode = if (o.containsField("localCustodianCode")) Some(o.as[Int]("localCustodianCode")) else None
+    val lines = o.as[List[String]]("lines")
+    new DbAddress(id, lines, town, postcode, subdivision, localCustodianCode)
   }
 
   @tailrec
