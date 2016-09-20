@@ -49,7 +49,7 @@ case class DbAddress(id: String, lines: List[String], town: Option[String], post
   def line3 = if (lines.size > 2) lines(2) else ""
 
   // For use as input to MongoDbObject (hence it's not a Map)
-  def tupled = List("_id" -> id, "lines" -> lines) ++
+  def tupled: List[(String, Any)] = List("_id" -> id, "lines" -> lines) ++
     town.map("town" -> _) ++
     List("postcode" -> postcode) ++
     subdivision.map("subdivision" -> _) ++
@@ -62,10 +62,6 @@ case class DbAddress(id: String, lines: List[String], town: Option[String], post
 
 
 object DbAddress {
-
-  def apply(id: String, line1: String, line2: String, line3: String, town: Option[String], postcode: String, subdivision: Option[String], localCustodianCode: Option[Int]): DbAddress = {
-    apply(id, List(line1, line2, line3).filterNot(_ == ""), town, postcode, subdivision, localCustodianCode)
-  }
 
   def apply(o: MongoDBObject): DbAddress = {
     val id = o.as[String]("_id")

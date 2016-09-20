@@ -24,8 +24,8 @@ import uk.co.hmrc.helper.EmbeddedMongoSuite
 
 class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
 
-  val a1 = DbAddress("GB47070784", "A1", "Line2", "Line3", Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some(1234))
-  val a2 = DbAddress("GB47070785", "A2", "Line2", "Line3", Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some(1234))
+  val a1 = DbAddress("GB47070784", List("A1", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some(1234))
+  val a2 = DbAddress("GB47070785", List("A2", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some(1234))
 
   def casbahFixtures(m: DBObject*) = {
     val collection = casbahMongoConnection.getConfiguredDb("address")
@@ -52,7 +52,7 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
     assert(DbAddress(new MongoDBObject(list(1))) === a2)
   }
 
-  test("read (only) using ReactiveMongo") {
+  test("read (only) using ReactiveMongo - populated case") {
     val id = BSONString(a1.id)
     val lines = BSONArray(a1.lines.map(s => BSONString(s)))
     val town = BSONString(a1.town.get)
@@ -65,31 +65,14 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
     assert(r === a1)
   }
 
-  test("read (only) using ReactiveMongo - empty case, prefix") {
+  test("read (only) using ReactiveMongo - empty case") {
     val id = BSONString(a1.id)
     val lines = BSONArray()
     val postcode = BSONString(a1.postcode)
-    val subdivision = BSONString(a1.subdivision.get)
-    val localCustodianCode = BSONInteger(a1.localCustodianCode.get)
-    val bson = BSONDocument("_id" -> id, "lines" -> lines, "postcode" -> postcode, "subdivision" -> subdivision, "localCustodianCode" -> localCustodianCode)
+    val bson = BSONDocument("_id" -> id, "lines"-> BSONArray(), "postcode" -> postcode)
     val r = BSONDbAddress.read(bson)
 
-    assert(r === new DbAddress("GB47070784", Nil, None, "NE30 4HG", Some("GB-ENG"), Some(1234)))
-  }
-
-  test("read (only) using ReactiveMongo - using lines - empty case, no prefix") {
-    val id = BSONString(a1.id)
-    val lines = BSONArray()
-    val postcode = BSONString(a1.postcode)
-    val subdivision = BSONString(a1.subdivision.get)
-    val localCustodianCode = BSONInteger(a1.localCustodianCode.get)
-    val bson = BSONDocument("_id" -> id, "lines"-> BSONArray(), "postcode" -> postcode, "subdivision" -> subdivision, "localCustodianCode" -> localCustodianCode)
-    val r = BSONDbAddress.read(bson)
-
-    assert(r === new DbAddress("GB47070784", Nil, None, "NE30 4HG", Some("GB-ENG"), Some(1234)
-
-
-    ))
+    assert(r === new DbAddress("GB47070784", Nil, None, "NE30 4HG", None, None))
   }
 
 }
