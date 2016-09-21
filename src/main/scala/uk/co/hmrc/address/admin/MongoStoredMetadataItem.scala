@@ -67,7 +67,9 @@ class MongoStoredMetadataItem(collection: MongoCollection, itemKey: String, init
     */
   def get: String = {
     val filter = "_id" $eq itemKey
-    collection.findOne(filter).get("value").toString
+    val found = collection.findOne(filter)
+    if (found.isEmpty) "" // abnormal state - can only happen if the collection is externally modified or deleted
+    else found.get.apply("value").toString
   }
 
   /**

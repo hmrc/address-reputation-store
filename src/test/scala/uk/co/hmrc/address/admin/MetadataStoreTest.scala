@@ -60,6 +60,20 @@ class MetadataStoreTest extends WordSpec with EmbeddedMongoSuite {
           "Info:Updated keyValue='started' to the admin store in Mongo."
         ))
       }
+
+      """
+           cleanly handle an invalid state where the stored item is missing
+      """ in {
+        val logger = new StubLogger(true)
+        val collection = casbahMongoConnection.getConfiguredDb("admin")
+        collection.drop()
+
+        val keyValue = new MongoStoredMetadataItem(collection, "keyValue", "started", logger)
+        assert(keyValue.get === "started")
+
+        collection.drop()
+        assert(keyValue.get === "")
+      }
     }
 
     "used as a distributed lock" should {
