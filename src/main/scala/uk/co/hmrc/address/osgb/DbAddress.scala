@@ -32,7 +32,13 @@ trait Document {
   * For non-UK addresses, 'town' may be absent and there may be an extra line instead.
   */
 // id typically consists of some prefix and the uprn
-case class DbAddress(id: String, lines: List[String], town: Option[String], postcode: String, subdivision: Option[String], localCustodianCode: Option[Int]) extends Document {
+case class DbAddress(id: String,
+                     lines: List[String],
+                     town: Option[String],
+                     postcode: String,
+                     subdivision: Option[String],
+                     country: Option[String],
+                     localCustodianCode: Option[Int]) extends Document {
 
   // UPRN is specified to be an integer of up to 12 digits (it can also be assumed to be always positive)
   def uprn: Long = DbAddress.trimLeadingLetters(id).toLong
@@ -53,6 +59,7 @@ case class DbAddress(id: String, lines: List[String], town: Option[String], post
     town.map("town" -> _) ++
     List("postcode" -> postcode) ++
     subdivision.map("subdivision" -> _) ++
+    country.map("country" -> _) ++
     localCustodianCode.map("localCustodianCode" -> _)
 
   def splitPostcode = Postcode(postcode)
@@ -68,9 +75,10 @@ object DbAddress {
     val town = if (o.containsField("town")) Some(o.as[String]("town")) else None
     val postcode = o.as[String]("postcode")
     val subdivision = if (o.containsField("subdivision")) Some(o.as[String]("subdivision")) else None
+    val country = if (o.containsField("country")) Some(o.as[String]("country")) else None
     val localCustodianCode = if (o.containsField("localCustodianCode")) Some(o.as[Int]("localCustodianCode")) else None
     val lines = o.as[List[String]]("lines")
-    new DbAddress(id, lines, town, postcode, subdivision, localCustodianCode)
+    new DbAddress(id, lines, town, postcode, subdivision, country, localCustodianCode)
   }
 
   @tailrec

@@ -24,8 +24,8 @@ import uk.co.hmrc.helper.EmbeddedMongoSuite
 
 class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
 
-  val a1 = DbAddress("GB47070784", List("A1", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some(1234))
-  val a2 = DbAddress("GB47070785", List("A2", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some(1234))
+  val a1 = DbAddress("GB47070784", List("A1", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some("UK"), Some(1234))
+  val a2 = DbAddress("GB47070785", List("A2", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some("UK"), Some(1234))
 
   def casbahFixtures(m: DBObject*) = {
     val collection = casbahMongoConnection.getConfiguredDb("address")
@@ -58,8 +58,9 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
     val town = BSONString(a1.town.get)
     val postcode = BSONString(a1.postcode)
     val subdivision = BSONString(a1.subdivision.get)
+    val country = BSONString(a1.country.get)
     val localCustodianCode = BSONInteger(a1.localCustodianCode.get)
-    val bson = BSONDocument("_id" -> id, "lines" -> lines, "town" -> town, "postcode" -> postcode, "subdivision" -> subdivision, "localCustodianCode" -> localCustodianCode)
+    val bson = BSONDocument("_id" -> id, "lines" -> lines, "town" -> town, "postcode" -> postcode, "subdivision" -> subdivision, "country" -> country, "localCustodianCode" -> localCustodianCode)
     val r = BSONDbAddress.read(bson)
 
     assert(r === a1)
@@ -72,7 +73,7 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
     val bson = BSONDocument("_id" -> id, "lines"-> BSONArray(), "postcode" -> postcode)
     val r = BSONDbAddress.read(bson)
 
-    assert(r === new DbAddress("GB47070784", Nil, None, "NE30 4HG", None, None))
+    assert(r === new DbAddress("GB47070784", Nil, None, "NE30 4HG", None, None, None))
   }
 
 }
