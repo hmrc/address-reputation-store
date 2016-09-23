@@ -38,8 +38,10 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
   }
 
   test("write then read using Casbah") {
-    val m1 = MongoDBObject(a1.tupled)
-    val m2 = MongoDBObject(a2.tupled)
+    val a1t = a1.tupled ++ List("_id" -> a1.id)
+    val a2t = a2.tupled ++ List("_id" -> a2.id)
+    val m1 = MongoDBObject(a1t)
+    val m2 = MongoDBObject(a2t)
     val collection = casbahFixtures(m1, m2)
 
     assert(collection.size === 2)

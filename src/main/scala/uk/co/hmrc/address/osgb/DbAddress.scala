@@ -16,12 +16,15 @@
 
 package uk.co.hmrc.address.osgb
 
-import com.mongodb.casbah.commons.MongoDBObject
+import java.util
 
 import scala.annotation.tailrec
+import scala.collection.mutable
 
 trait Document {
   def tupled: List[(String, Any)]
+
+  final def toMap = tupled.toMap
 
   def normalise: Document
 }
@@ -55,12 +58,31 @@ case class DbAddress(id: String,
   def line3 = if (lines.size > 2) lines(2) else ""
 
   // For use as input to MongoDbObject (hence it's not a Map)
-  def tupled: List[(String, Any)] = List("_id" -> id, "lines" -> lines) ++
-    town.map("town" -> _) ++
-    List("postcode" -> postcode) ++
-    subdivision.map("subdivision" -> _) ++
-    country.map("country" -> _) ++
-    localCustodianCode.map("localCustodianCode" -> _)
+  def tupled: List[(String, Any)] = {
+    List(
+      "lines" -> lines,
+      "postcode" -> postcode) ++
+      town.toList.map("town" -> _) ++
+      subdivision.toList.map("subdivision" -> _) ++
+      country.toList.map("country" -> _) ++
+      localCustodianCode.toList.map("localCustodianCode" -> _)
+  }
+
+  // We're still providing two structures for the lines, pending a decision on how ES will be used.
+  def tupledFlat: List[(String, Any)] = {
+    def optLine1 = if (lines.nonEmpty) List(lines.head) else Nil
+    def optLine2 = if (lines.size > 1) List(lines(1)) else Nil
+    def optLine3 = if (lines.size > 2) List(lines(2)) else Nil
+    List(
+      "postcode" -> postcode) ++
+      optLine1.map("line1" -> _) ++
+      optLine2.map("line2" -> _) ++
+      optLine3.map("line3" -> _) ++
+      town.toList.map("town" -> _) ++
+      subdivision.toList.map("subdivision" -> _) ++
+      country.toList.map("country" -> _) ++
+      localCustodianCode.toList.map("localCustodianCode" -> _)
+  }
 
   def splitPostcode = Postcode(postcode)
 
@@ -70,15 +92,43 @@ case class DbAddress(id: String,
 
 object DbAddress {
 
-  def apply(o: MongoDBObject): DbAddress = {
-    val id = o.as[String]("_id")
-    val town = if (o.containsField("town")) Some(o.as[String]("town")) else None
-    val postcode = o.as[String]("postcode")
-    val subdivision = if (o.containsField("subdivision")) Some(o.as[String]("subdivision")) else None
-    val country = if (o.containsField("country")) Some(o.as[String]("country")) else None
-    val localCustodianCode = if (o.containsField("localCustodianCode")) Some(o.as[Int]("localCustodianCode")) else None
-    val lines = o.as[List[String]]("lines")
-    new DbAddress(id, lines, town, postcode, subdivision, country, localCustodianCode)
+  import scala.collection.JavaConverters._
+
+  // This is compatible with MongoDBObject.
+  def apply(o: mutable.Map[String, AnyRef]): DbAddress = {
+    apply(o.toMap)
+  }
+
+  // This is compatible with Elasticsearch results.
+  def apply(fields: Map[String, AnyRef]): DbAddress = {
+    val id = fields.getOrElse("id", fields("_id")).toString
+    val linesField = fields.get("lines")
+
+    val lines: List[String] = if (linesField.isDefined) {
+      convertLines(linesField.get)
+    } else {
+      val line1 = fields.getOrElse("line1", "").toString
+      val line2 = fields.getOrElse("line2", "").toString
+      val line3 = fields.getOrElse("line3", "").toString
+      List(line1, line2, line3).filterNot(_.isEmpty)
+    }
+
+    DbAddress(
+      id,
+      lines,
+      fields.get("town").map(_.toString),
+      fields.getOrElse("postcode", "").toString,
+      fields.get("subdivision").map(_.toString),
+      fields.get("country").map(_.toString),
+      fields.get("localCustodianCode").map(_.toString.toInt)
+    )
+  }
+
+  private def convertLines(lines: AnyRef): List[String] = {
+    lines match {
+      case jl: util.List[_] => (List() ++ jl.asScala).map(_.toString)
+      case sl: List[_] => sl.map(_.toString)
+    }
   }
 
   @tailrec

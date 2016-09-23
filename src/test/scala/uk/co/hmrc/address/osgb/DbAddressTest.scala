@@ -44,9 +44,15 @@ class DbAddressTest extends FunSuite {
   }
 
   test("tupled") {
-    assert(a1.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "subdivision" -> "GB-ENG", "country" -> "UK", "localCustodianCode" -> 1234))
-    assert(a2.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1", "Line2"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "localCustodianCode" -> 1234))
-    assert(a4.tupled === List("_id" -> "GB47070784", "lines" -> List("Line1"), "postcode" -> "NE30 4HG"))
+    assert(a1.tupled.toMap === Map("lines" -> List("Line1", "Line2", "Line3"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "subdivision" -> "GB-ENG", "country" -> "UK", "localCustodianCode" -> 1234))
+    assert(a2.tupled.toMap === Map("lines" -> List("Line1", "Line2"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "localCustodianCode" -> 1234))
+    assert(a4.tupled.toMap === Map("lines" -> List("Line1"), "postcode" -> "NE30 4HG"))
+  }
+
+  test("tupledFlat") {
+    assert(a1.tupledFlat.toMap === Map("line1" -> "Line1", "line2" -> "Line2", "line3" -> "Line3", "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "subdivision" -> "GB-ENG", "country" -> "UK", "localCustodianCode" -> 1234))
+    assert(a2.tupledFlat.toMap === Map("line1" -> "Line1", "line2" -> "Line2", "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "localCustodianCode" -> 1234))
+    assert(a4.tupledFlat.toMap === Map("line1" -> "Line1", "postcode" -> "NE30 4HG"))
   }
 
   test("uprn") {

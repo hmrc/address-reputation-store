@@ -47,7 +47,8 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "reactivemongo-bson" % reactiveMongoVersion withSources(),
     "uk.gov.hmrc" %% "reactivemongo-bson-macros" % reactiveMongoVersion withSources(),
     "com.univocity" % "univocity-parsers" % "1.5.6" withSources(),
-    "org.mongodb" %% "casbah" % "3.1.1"
+    "org.mongodb" %% "casbah" % "3.1.1",
+    "com.sksamuel.elastic4s" %% "elastic4s-core" % "2.3.1" excludeAll ExclusionRule(organization = "io.netty")
   )
 
   trait TestDependencies {
