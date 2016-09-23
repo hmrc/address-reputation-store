@@ -42,7 +42,8 @@ private object AppDependencies {
   val reactiveMongoVersion = "0.11.8"
 
   val compile = Seq(
-    //NOTE: 0.11.6 Netty 3.10.4.Final clashes with Play (2.3.10) version of Netty 3.9.8
+    // netty 3.10 has a breaking API change
+    "io.netty" % "netty" % "3.9.9.Final" force(),
     "uk.gov.hmrc" %% "reactivemongo" % reactiveMongoVersion withSources(),
     "uk.gov.hmrc" %% "reactivemongo-bson" % reactiveMongoVersion withSources(),
     "uk.gov.hmrc" %% "reactivemongo-bson-macros" % reactiveMongoVersion withSources(),
