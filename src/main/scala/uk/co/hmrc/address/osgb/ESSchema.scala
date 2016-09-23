@@ -22,21 +22,26 @@ import com.sksamuel.elastic4s.mappings.FieldType.{DateType, StringType}
 
 object ESSchema {
 
-  def defaultIndexSettings = {
-    val is = new IndexSettings()
-    is.shards = 1
-    is.replicas = 0
-    is.refreshInterval = "60s"
-    is
+  // This is provided because IndexSettings has a more tricky API
+  case class Settings(shards: Int = 1, replicas: Int = 0, refreshInterval: String = "60s") {
+    def settings = {
+      val is = new IndexSettings()
+      is.shards = shards
+      is.replicas = replicas
+      is.refreshInterval = refreshInterval
+      is.settings
+    }
   }
 
   def createIndexDefinition(indexName: String,
                             addressDocType: String = "address",
                             metadataDocType: String = "metadata",
-                            settings: IndexSettings = defaultIndexSettings) = {
+                            settings: Settings = Settings()) = {
 
     val definition = CreateIndexDefinition(indexName)
+
     definition._settings.settings ++= settings.settings
+
     definition mappings {
       mapping(addressDocType) fields(
         //TODO lines should be an array - perhaps?
