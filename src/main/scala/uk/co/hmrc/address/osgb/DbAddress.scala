@@ -84,6 +84,10 @@ case class DbAddress(id: String,
       localCustodianCode.toList.map("localCustodianCode" -> _)
   }
 
+  def forMongoDb: List[(String, Any)] = tupled ++ List("_id" -> id)
+
+  def forElasticsearch: Map[String, Any] = tupledFlat.toMap + ("id" -> id)
+
   def splitPostcode = Postcode(postcode)
 
   def normalise = this
