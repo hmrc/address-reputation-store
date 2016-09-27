@@ -35,13 +35,19 @@ trait Document {
   * For non-UK addresses, 'town' may be absent and there may be an extra line instead.
   */
 // id typically consists of some prefix and the uprn
-case class DbAddress(id: String,
-                     lines: List[String],
-                     town: Option[String],
-                     postcode: String,
-                     subdivision: Option[String],
-                     country: Option[String],
-                     localCustodianCode: Option[Int]) extends Document {
+case class DbAddress(
+                      id: String,
+                      lines: List[String],
+                      town: Option[String],
+                      postcode: String,
+                      subdivision: Option[String],
+                      country: Option[String],
+                      localCustodianCode: Option[Int],
+                      language: Option[String],
+                      blpuState: Option[Int],
+                      logicalState: Option[Int],
+                      streetClass: Option[Int]
+                    ) extends Document {
 
   // UPRN is specified to be an integer of up to 12 digits (it can also be assumed to be always positive)
   def uprn: Long = DbAddress.trimLeadingLetters(id).toLong
@@ -65,7 +71,11 @@ case class DbAddress(id: String,
       town.toList.map("town" -> _) ++
       subdivision.toList.map("subdivision" -> _) ++
       country.toList.map("country" -> _) ++
-      localCustodianCode.toList.map("localCustodianCode" -> _)
+      localCustodianCode.toList.map("localCustodianCode" -> _) ++
+      language.toList.map("language" -> _) ++
+      blpuState.toList.map("blpuState" -> _) ++
+      logicalState.toList.map("logicalState" -> _) ++
+      streetClass.toList.map("streetClass" -> _)
   }
 
   // We're still providing two structures for the lines, pending a decision on how ES will be used.
@@ -81,7 +91,11 @@ case class DbAddress(id: String,
       town.toList.map("town" -> _) ++
       subdivision.toList.map("subdivision" -> _) ++
       country.toList.map("country" -> _) ++
-      localCustodianCode.toList.map("localCustodianCode" -> _)
+      localCustodianCode.toList.map("localCustodianCode" -> _) ++
+      language.toList.map("language" -> _) ++
+      blpuState.toList.map("blpuState" -> _) ++
+      logicalState.toList.map("logicalState" -> _) ++
+      streetClass.toList.map("streetClass" -> _)
   }
 
   def forMongoDb: List[(String, Any)] = tupled ++ List("_id" -> id)
@@ -97,6 +111,9 @@ case class DbAddress(id: String,
 object DbAddress {
 
   import scala.collection.JavaConverters._
+
+  final val English = "en"
+  final val Cymraeg = "cy"
 
   // This is compatible with MongoDBObject.
   def apply(o: mutable.Map[String, AnyRef]): DbAddress = {
@@ -124,9 +141,19 @@ object DbAddress {
       fields.getOrElse("postcode", "").toString,
       fields.get("subdivision").map(_.toString),
       fields.get("country").map(_.toString),
-      fields.get("localCustodianCode").map(_.toString.toInt)
+      fields.get("localCustodianCode").map(toInteger),
+      fields.get("language").map(_.toString),
+      fields.get("blpuState").map(toInteger),
+      fields.get("logicalState").map(toInteger),
+      fields.get("streetClass").map(toInteger)
     )
   }
+
+  private def toInteger(v: Any): Int =
+    v match {
+      case i: Int => i
+      case _ => v.toString.toInt
+    }
 
   private def convertLines(lines: AnyRef): List[String] = {
     lines match {

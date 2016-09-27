@@ -19,10 +19,11 @@ package uk.co.hmrc.address.osgb
 import org.scalatest.FunSuite
 
 class DbAddressTest extends FunSuite {
+  import DbAddress._
 
-  val a1 = DbAddress("GB47070784", List("Line1", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some("UK"), Some(1234))
-  val a2 = DbAddress("GB47070784", List("Line1", "Line2"), Some("Tynemouth"), "NE30 4HG", None, None, Some(1234))
-  val a4 = DbAddress("GB47070784", List("Line1"), None, "NE30 4HG", None, None, None)
+  val a1 = DbAddress("GB47070784", List("Line1", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some("UK"), Some(1234), Some(English), Some(2), Some(1), Some(8))
+  val a2 = DbAddress("GB47070784", List("Line1", "Line2"), Some("Tynemouth"), "NE30 4HG", None, None, Some(1234), Some(English), None, None, None)
+  val a4 = DbAddress("GB47070784", List("Line1"), None, "NE30 4HG", None, None, None, None, None, None, None)
 
   test("linesContainIgnoreCase - check we can find a match in line1, case insensitive") {
     assert(a1.linesContainIgnoreCase("e1") === true)
@@ -44,14 +45,14 @@ class DbAddressTest extends FunSuite {
   }
 
   test("tupled") {
-    assert(a1.forMongoDb.toMap === Map("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "subdivision" -> "GB-ENG", "country" -> "UK", "localCustodianCode" -> 1234))
-    assert(a2.forMongoDb.toMap === Map("_id" -> "GB47070784", "lines" -> List("Line1", "Line2"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "localCustodianCode" -> 1234))
+    assert(a1.forMongoDb.toMap === Map("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "subdivision" -> "GB-ENG", "country" -> "UK", "localCustodianCode" -> 1234, "language" -> "en", "blpuState" -> 2, "logicalState" -> 1, "streetClass" -> 8))
+    assert(a2.forMongoDb.toMap === Map("_id" -> "GB47070784", "lines" -> List("Line1", "Line2"), "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "localCustodianCode" -> 1234, "language" -> "en"))
     assert(a4.forMongoDb.toMap === Map("_id" -> "GB47070784", "lines" -> List("Line1"), "postcode" -> "NE30 4HG"))
   }
 
   test("tupledFlat") {
-    assert(a1.forElasticsearch === Map("id" -> "GB47070784", "line1" -> "Line1", "line2" -> "Line2", "line3" -> "Line3", "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "subdivision" -> "GB-ENG", "country" -> "UK", "localCustodianCode" -> 1234))
-    assert(a2.forElasticsearch === Map("id" -> "GB47070784", "line1" -> "Line1", "line2" -> "Line2", "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "localCustodianCode" -> 1234))
+    assert(a1.forElasticsearch === Map("id" -> "GB47070784", "line1" -> "Line1", "line2" -> "Line2", "line3" -> "Line3", "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "subdivision" -> "GB-ENG", "country" -> "UK", "localCustodianCode" -> 1234, "language" -> "en", "blpuState" -> 2, "logicalState" -> 1, "streetClass" -> 8))
+    assert(a2.forElasticsearch === Map("id" -> "GB47070784", "line1" -> "Line1", "line2" -> "Line2", "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "localCustodianCode" -> 1234, "language" -> "en"))
     assert(a4.forElasticsearch === Map("id" -> "GB47070784", "line1" -> "Line1", "postcode" -> "NE30 4HG"))
   }
 

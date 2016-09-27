@@ -24,8 +24,10 @@ import uk.co.hmrc.helper.EmbeddedMongoSuite
 
 class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
 
-  val a1 = DbAddress("GB47070784", List("A1", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some("UK"), Some(1234))
-  val a2 = DbAddress("GB47070785", List("A2", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some("UK"), Some(1234))
+  import DbAddress._
+
+  val a1 = DbAddress("GB47070784", List("A1", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some("UK"), Some(1234), Some(English), Some(2), Some(1), Some(8))
+  val a2 = DbAddress("GB47070785", List("A2", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some("UK"), Some(1234), Some(English), Some(2), Some(1), Some(8))
 
   def casbahFixtures(m: DBObject*) = {
     val collection = casbahMongoConnection.getConfiguredDb("address")
@@ -55,27 +57,31 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
   }
 
   test("read (only) using ReactiveMongo - populated case") {
-    val id = BSONString(a1.id)
-    val lines = BSONArray(a1.lines.map(s => BSONString(s)))
-    val town = BSONString(a1.town.get)
-    val postcode = BSONString(a1.postcode)
-    val subdivision = BSONString(a1.subdivision.get)
-    val country = BSONString(a1.country.get)
-    val localCustodianCode = BSONInteger(a1.localCustodianCode.get)
-    val bson = BSONDocument("_id" -> id, "lines" -> lines, "town" -> town, "postcode" -> postcode, "subdivision" -> subdivision, "country" -> country, "localCustodianCode" -> localCustodianCode)
+    val bson = BSONDocument(
+      "_id" -> BSONString(a1.id),
+      "lines" -> BSONArray(a1.lines.map(s => BSONString(s))),
+      "town" -> BSONString(a1.town.get),
+      "postcode" -> BSONString(a1.postcode),
+      "subdivision" -> BSONString(a1.subdivision.get),
+      "country" -> BSONString(a1.country.get),
+      "localCustodianCode" -> BSONInteger(a1.localCustodianCode.get),
+      "language" -> BSONString("en"),
+      "blpuState" -> BSONInteger(a1.blpuState.get),
+      "logicalState" -> BSONInteger(a1.logicalState.get),
+      "streetClass" -> BSONInteger(a1.streetClass.get))
     val r = BSONDbAddress.read(bson)
 
     assert(r === a1)
   }
 
   test("read (only) using ReactiveMongo - empty case") {
-    val id = BSONString(a1.id)
-    val lines = BSONArray()
-    val postcode = BSONString(a1.postcode)
-    val bson = BSONDocument("_id" -> id, "lines"-> BSONArray(), "postcode" -> postcode)
+    val bson = BSONDocument(
+      "_id" -> BSONString(a1.id),
+      "lines" -> BSONArray(),
+      "postcode" -> BSONString(a1.postcode))
     val r = BSONDbAddress.read(bson)
 
-    assert(r === new DbAddress("GB47070784", Nil, None, "NE30 4HG", None, None, None))
+    assert(r === new DbAddress("GB47070784", Nil, None, "NE30 4HG", None, None, None, None, None, None, None))
   }
 
 }
