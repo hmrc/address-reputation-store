@@ -93,3 +93,19 @@ object Stdout extends SimpleLogger {
     t.printStackTrace(System.out)
   }
 }
+
+
+/** Sinks all messages written to it. */
+object BlackHole extends SimpleLogger {
+  override def info(format: String, arguments: AnyRef*) {}
+
+  override def info(msg: String, t: Throwable) {}
+
+  override def warn(format: String, arguments: AnyRef*) {}
+
+  override def warn(msg: String, t: Throwable) {}
+
+  override def error(format: String, arguments: AnyRef*) {}
+
+  override def error(msg: String, t: Throwable) {}
+}
