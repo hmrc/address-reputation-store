@@ -16,7 +16,13 @@
 
 package uk.gov.hmrc.address.v2
 
-case class LocalCustodian(code: Int, name: String)
+import uk.gov.hmrc.address.v1
+
+
+case class LocalCustodian(code: Int, name: String) {
+
+  def asV1 = v1.LocalCustodian(code, name)
+}
 
 
 /**
@@ -36,4 +42,6 @@ case class AddressRecord(
   def truncatedAddress(maxLen: Int = Address.maxLineLength) =
     if (address.longestLineLength <= maxLen) this
     else AddressRecord(id, uprn, address.truncatedAddress(maxLen), localCustodian, language)
+
+  def asV1 = v1.AddressRecord(id, uprn, address.asV1, localCustodian.map(_.asV1), language)
 }

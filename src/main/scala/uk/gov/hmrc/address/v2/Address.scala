@@ -19,6 +19,7 @@ package uk.gov.hmrc.address.v2
 import java.util.regex.Pattern
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import uk.gov.hmrc.address.v1
 
 /**
   * Address typically represents a postal address.
@@ -71,6 +72,8 @@ case class Address(lines: List[String],
 
   def truncatedAddress(maxLen: Int = Address.maxLineLength): Address =
     Address(lines.map(limit(_, maxLen)), town.map(limit(_, maxLen)), county.map(limit(_, maxLen)), postcode, subdivision, country)
+
+  def asV1 = v1.Address(lines, town, county, postcode, subdivision.map(_.code), country.asV1)
 }
 
 

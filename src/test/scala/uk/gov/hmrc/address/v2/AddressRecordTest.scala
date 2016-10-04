@@ -35,4 +35,10 @@ class AddressRecordTest extends FunSuite {
     assert(
       lar.truncatedAddress(12) === AddressRecord("id", Some(456L), longAddress.truncatedAddress(12), Some(lc1), "en"))
   }
+
+  test("asV1") {
+    val sar = AddressRecord("id", Some(123L), shortAddress, Some(lc1), "en")
+    assert(sar.asV1.id === sar.id)
+    assert(sar.asV1.address.lines === sar.address.lines)
+  }
 }

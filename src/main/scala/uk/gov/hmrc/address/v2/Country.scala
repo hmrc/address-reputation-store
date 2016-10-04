@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.address.v2
 
+import uk.gov.hmrc.address.v1
+
 /** Represents a country as per ISO3166. */
 case class Country(
                     // ISO3166-1 or ISO3166-2 code, e.g. "GB" or "GB-ENG" (note that "GB" is the official
@@ -24,7 +26,10 @@ case class Country(
                     // and https://en.wikipedia.org/wiki/ISO_3166-2:GB
                     code: String,
                     // The printable name for the country, e.g. "United Kingdom"
-                    name: String)
+                    name: String) {
+
+  def asV1 = v1.Country(code, name)
+}
 
 
 object Countries {
