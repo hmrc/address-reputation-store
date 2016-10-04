@@ -46,10 +46,16 @@ object Countries {
 
   def find(code: String): Country =
     code match {
-      case UK.code => UK
+      case "UK" | "GB" => UK // special case provided for in ISO-3166
       case GG.code => GG
       case IM.code => IM
       case JE.code => JE
+
+      case England.code => England
+      case Scotland.code => Scotland
+      case Wales.code => Wales
+      case NorthernIreland.code => NorthernIreland
+
       case _ => ???
     }
 }
