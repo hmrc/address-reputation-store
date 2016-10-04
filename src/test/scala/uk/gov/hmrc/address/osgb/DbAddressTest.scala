@@ -49,7 +49,7 @@ class DbAddressTest extends FunSuite {
     assert(a1.forMongoDb.toMap === Map("_id" -> "GB47070784", "lines" -> List("Line1", "Line2", "Line3"),
       "town" -> "Tynemouth", "postcode" -> "NE30 4HG", "subdivision" -> "GB-ENG", "country" -> "UK",
       "localCustodianCode" -> 1234, "language" -> "en", "blpuState" -> 2, "logicalState" -> 1,
-      "streetClass" -> 8, "blpuClass" -> "1", "location" -> "1.0,-1.0"))
+      "streetClass" -> 8, "blpuClass" -> "1"))
     assert(a2.forMongoDb.toMap === Map("_id" -> "GB47070784", "lines" -> List("Line1", "Line2"), "town" -> "Tynemouth",
       "postcode" -> "NE30 4HG", "localCustodianCode" -> 1234, "language" -> "en"))
     assert(a4.forMongoDb.toMap === Map("_id" -> "GB47070784", "lines" -> List("Line1"), "postcode" -> "NE30 4HG"))

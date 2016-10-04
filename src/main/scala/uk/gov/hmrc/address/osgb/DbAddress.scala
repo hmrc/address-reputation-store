@@ -80,8 +80,7 @@ case class DbAddress(
       blpuState.toList.map("blpuState" -> _) ++
       logicalState.toList.map("logicalState" -> _) ++
       streetClass.toList.map("streetClass" -> _) ++
-      blpuClass.toList.map("blpuClass" -> _) ++
-      location.toList.map("location" -> _)
+      blpuClass.toList.map("blpuClass" -> _)
   }
 
   // We're still providing two structures for the lines, pending a decision on how ES will be used.
