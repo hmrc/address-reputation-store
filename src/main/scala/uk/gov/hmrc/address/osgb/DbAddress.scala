@@ -49,9 +49,8 @@ case class DbAddress(
                       blpuState: Option[Int],
                       logicalState: Option[Int],
                       streetClass: Option[Int],
-                      latitude: Option[Float],
-                      longitude: Option[Float],
-                      location: Option[String] = None
+                      blpuClass: Option[String],
+                      location: Option[String]
                     ) extends Document {
 
   // UPRN is specified to be an integer of up to 12 digits (it can also be assumed to be always positive)
@@ -80,7 +79,9 @@ case class DbAddress(
       language.toList.map("language" -> _) ++
       blpuState.toList.map("blpuState" -> _) ++
       logicalState.toList.map("logicalState" -> _) ++
-      streetClass.toList.map("streetClass" -> _)
+      streetClass.toList.map("streetClass" -> _) ++
+      blpuClass.toList.map("blpuClass" -> _) ++
+      location.toList.map("location" -> _)
   }
 
   // We're still providing two structures for the lines, pending a decision on how ES will be used.
@@ -101,7 +102,8 @@ case class DbAddress(
       blpuState.toList.map("blpuState" -> _) ++
       logicalState.toList.map("logicalState" -> _) ++
       streetClass.toList.map("streetClass" -> _) ++
-      loc.toList.map("location" -> _)
+      blpuClass.toList.map("blpuClass" -> _) ++
+      location.toList.map("location" -> _)
   }
 
   def forMongoDb: List[(String, Any)] = tupled ++ List("_id" -> id)
@@ -109,13 +111,6 @@ case class DbAddress(
   def forElasticsearch: Map[String, Any] = tupledFlat.toMap + ("id" -> id)
 
   def splitPostcode = Postcode(postcode)
-
-  def loc: Option[String] = {
-    for {
-      lat <- latitude
-      long <- longitude
-    } yield s"$lat,$long"
-  }
 
   def normalise = this
 }
@@ -159,8 +154,8 @@ object DbAddress {
       fields.get("blpuState").map(toInteger),
       fields.get("logicalState").map(toInteger),
       fields.get("streetClass").map(toInteger),
-      fields.get("latitude").map(toFloat),
-      fields.get("longitude").map(toFloat)
+      fields.get("blpuClass").map(_.toString),
+      fields.get("location").map(_.toString)
     )
   }
 

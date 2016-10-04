@@ -26,10 +26,10 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
 
   import DbAddress._
 
-  val a1 = DbAddress("GB47070784", List("A1", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some("UK"), Some(1234), Some(English), Some(2), Some(1), Some(8), Some(1.0f), Some(-1.0f))
-  val a1compare = DbAddress("GB47070784", List("A1", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some("UK"), Some(1234), Some(English), Some(2), Some(1), Some(8), None, None)
-  val a2 = DbAddress("GB47070785", List("A2", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some("UK"), Some(1234), Some(English), Some(2), Some(1), Some(8), Some(1.0f), Some(-1.0f))
-  val a2compare = DbAddress("GB47070785", List("A2", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"), Some("UK"), Some(1234), Some(English), Some(2), Some(1), Some(8), None, None)
+  val a1 = DbAddress("GB47070784", List("A1", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"),
+    Some("UK"), Some(1234), Some(English), Some(2), Some(1), Some(8), Some("1.0,-1.0"), Some("1"))
+  val a2 = DbAddress("GB47070785", List("A2", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"),
+    Some("UK"), Some(1234), Some(English), Some(2), Some(1), Some(8), Some("1.0,-1.0"), Some("1"))
 
   def casbahFixtures(m: DBObject*) = {
     val collection = casbahMongoConnection.getConfiguredDb("address")
@@ -54,8 +54,8 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
     assert(list.size === 2)
     assert(list === List(m1, m2))
 
-    assert(DbAddress(new MongoDBObject(list(0))) === a1compare)
-    assert(DbAddress(new MongoDBObject(list(1))) === a2compare)
+    assert(DbAddress(new MongoDBObject(list(0))) === a1)
+    assert(DbAddress(new MongoDBObject(list(1))) === a2)
   }
 
   test("read (only) using ReactiveMongo - populated case") {
@@ -70,10 +70,12 @@ class DbAddressIntegration extends FunSuite with EmbeddedMongoSuite {
       "language" -> BSONString("en"),
       "blpuState" -> BSONInteger(a1.blpuState.get),
       "logicalState" -> BSONInteger(a1.logicalState.get),
-      "streetClass" -> BSONInteger(a1.streetClass.get))
+      "streetClass" -> BSONInteger(a1.streetClass.get),
+      "blpuClass" -> BSONString(a1.blpuClass.get),
+      "location" -> BSONString(a1.location.get))
     val r = BSONDbAddress.read(bson)
 
-    assert(r === a1compare)
+    assert(r === a1)
   }
 
   test("read (only) using ReactiveMongo - empty case") {
