@@ -50,7 +50,8 @@ case class DbAddress(
                       logicalState: Option[Int],
                       streetClass: Option[Int],
                       latitude: Option[Float],
-                      longitude: Option[Float]
+                      longitude: Option[Float],
+                      location: Option[String] = None
                     ) extends Document {
 
   // UPRN is specified to be an integer of up to 12 digits (it can also be assumed to be always positive)
@@ -100,7 +101,7 @@ case class DbAddress(
       blpuState.toList.map("blpuState" -> _) ++
       logicalState.toList.map("logicalState" -> _) ++
       streetClass.toList.map("streetClass" -> _) ++
-      location.toList.map("location" -> _)
+      loc.toList.map("location" -> _)
   }
 
   def forMongoDb: List[(String, Any)] = tupled ++ List("_id" -> id)
@@ -109,7 +110,7 @@ case class DbAddress(
 
   def splitPostcode = Postcode(postcode)
 
-  def location: Option[String] = {
+  def loc: Option[String] = {
     for {
       lat <- latitude
       long <- longitude
