@@ -48,7 +48,9 @@ case class DbAddress(
                       language: Option[String],
                       blpuState: Option[Int],
                       logicalState: Option[Int],
-                      streetClass: Option[Int]
+                      streetClass: Option[Int],
+                      latitude: Option[Float],
+                      longitude: Option[Float]
                     ) extends Document {
 
   // UPRN is specified to be an integer of up to 12 digits (it can also be assumed to be always positive)
@@ -97,7 +99,8 @@ case class DbAddress(
       language.toList.map("language" -> _) ++
       blpuState.toList.map("blpuState" -> _) ++
       logicalState.toList.map("logicalState" -> _) ++
-      streetClass.toList.map("streetClass" -> _)
+      streetClass.toList.map("streetClass" -> _) ++
+      location.toList.map("location" -> _)
   }
 
   def forMongoDb: List[(String, Any)] = tupled ++ List("_id" -> id)
@@ -105,6 +108,13 @@ case class DbAddress(
   def forElasticsearch: Map[String, Any] = tupledFlat.toMap + ("id" -> id)
 
   def splitPostcode = Postcode(postcode)
+
+  def location: Option[String] = {
+    for {
+      lat <- latitude
+      long <- longitude
+    } yield s"$lat,$long"
+  }
 
   def normalise = this
 }
@@ -147,7 +157,9 @@ object DbAddress {
       fields.get("language").map(_.toString),
       fields.get("blpuState").map(toInteger),
       fields.get("logicalState").map(toInteger),
-      fields.get("streetClass").map(toInteger)
+      fields.get("streetClass").map(toInteger),
+      fields.get("latitude").map(toFloat),
+      fields.get("longitude").map(toFloat)
     )
   }
 
@@ -155,6 +167,12 @@ object DbAddress {
     v match {
       case i: Int => i
       case _ => v.toString.toInt
+    }
+
+  private def toFloat(v: Any): Float =
+    v match {
+      case f: Float => f
+      case _ => v.toString.toFloat
     }
 
   private def convertLines(lines: AnyRef): List[String] = {
