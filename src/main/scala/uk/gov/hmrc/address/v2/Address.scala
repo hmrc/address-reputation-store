@@ -32,46 +32,46 @@ case class Address(lines: List[String],
                    subdivision: Option[Country],
                    country: Country) {
 
-                     @JsonIgnore // needed because the name starts 'is...'
-                     def isValid = lines.nonEmpty && lines.size <= (if (town.isEmpty) 4 else 3)
+  @JsonIgnore // needed because the name starts 'is...'
+  def isValid = lines.nonEmpty && lines.size <= (if (town.isEmpty) 4 else 3)
 
-                     def nonEmptyFields: List[String] = lines ::: town.toList ::: county.toList ::: List(postcode)
+  def nonEmptyFields: List[String] = lines ::: town.toList ::: county.toList ::: List(postcode)
 
-                     /** Gets a conjoined representation, excluding the country. */
-                     def printable(separator: String): String = nonEmptyFields.mkString(separator)
+  /** Gets a conjoined representation, excluding the country. */
+  def printable(separator: String): String = nonEmptyFields.mkString(separator)
 
-                     /** Gets a single-line representation, excluding the country. */
-                     @JsonIgnore // needed because it's a field
-                     lazy val printable: String = printable(", ")
+  /** Gets a single-line representation, excluding the country. */
+  @JsonIgnore // needed because it's a field
+  lazy val printable: String = printable(", ")
 
-                     def line1 = if (lines.nonEmpty) lines.head else ""
+  def line1 = if (lines.nonEmpty) lines.head else ""
 
-                     def line2 = if (lines.size > 1) lines(1) else ""
+  def line2 = if (lines.size > 1) lines(1) else ""
 
-                     def line3 = if (lines.size > 2) lines(2) else ""
+  def line3 = if (lines.size > 2) lines(2) else ""
 
-                     def line4 = if (lines.size > 3) lines(3) else ""
+  def line4 = if (lines.size > 3) lines(3) else ""
 
-                     def longestLineLength = nonEmptyFields.map(_.length).max
+  def longestLineLength = nonEmptyFields.map(_.length).max
 
-                     private def limit(str: String, max: Int): String = {
-                       var s = str
-                       while (s.length > max && s.indexOf(", ") > 0) {
-                         s = s.replaceFirst(", ", ",")
-                       }
-                       if (s.length > max) {
-                         s = s.substring(0, max).trim
-                         if (Address.danglingLetter.matcher(s).matches()) {
-                           s = s.substring(0, s.length - 2)
-                         }
-                         s
-                       }
-                       else s
-                     }
+  private def limit(str: String, max: Int): String = {
+    var s = str
+    while (s.length > max && s.indexOf(", ") > 0) {
+      s = s.replaceFirst(", ", ",")
+    }
+    if (s.length > max) {
+      s = s.substring(0, max).trim
+      if (Address.danglingLetter.matcher(s).matches()) {
+        s = s.substring(0, s.length - 2)
+      }
+      s
+    }
+    else s
+  }
 
-                     def truncatedAddress(maxLen: Int = Address.maxLineLength): Address =
-                       Address(lines.map(limit(_, maxLen)), town.map(limit(_, maxLen)), county.map(limit(_, maxLen)), postcode, subdivision, country)
-                   }
+  def truncatedAddress(maxLen: Int = Address.maxLineLength): Address =
+    Address(lines.map(limit(_, maxLen)), town.map(limit(_, maxLen)), county.map(limit(_, maxLen)), postcode, subdivision, country)
+}
 
 
 object Address {
