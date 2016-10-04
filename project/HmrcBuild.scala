@@ -40,6 +40,9 @@ private object AppDependencies {
 
   // Important note: Play is *not* a dependency here, nor is it a transitive dependency.
   val reactiveMongoVersion = "0.11.8"
+  // Important note: Play is *not* a dependency here, nor is it a transitive dependency.
+
+  private val jacksonVersion = "2.7.4"
 
   val compile = Seq(
     // netty 3.10 has a breaking API change
@@ -48,7 +51,10 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "reactivemongo-bson" % reactiveMongoVersion withSources(),
     "uk.gov.hmrc" %% "reactivemongo-bson-macros" % reactiveMongoVersion withSources(),
     "com.univocity" % "univocity-parsers" % "1.5.6" withSources(),
-    "org.mongodb" %% "casbah" % "3.1.1"
+    "org.mongodb" %% "casbah" % "3.1.1",
+    "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
+    "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
+    "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion
   )
 
   trait TestDependencies {
