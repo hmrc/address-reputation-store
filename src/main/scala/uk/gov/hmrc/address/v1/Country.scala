@@ -34,12 +34,39 @@ object Countries {
   val IM = Country("IM", "Isle of Man")
   val JE = Country("JE", "Jersey")
 
-  def find(code: String): Country =
-    code match {
-      case "UK" | "GB" => UK // special case provided for in ISO-3166
-      case GG.code => GG
-      case IM.code => IM
-      case JE.code => JE
-      case _ => ???
+  val England = Country("GB-ENG", "England")
+  val Scotland = Country("GB-SCO", "Scotland")
+  val Wales = Country("GB-WLS", "Wales")
+  val NorthernIreland = Country("GB-NIR", "Northern Ireland")
+
+  // TODO this is not good enough - should consult a reference HMG-approved list of countries
+  def find(code: String): Option[Country] =
+  code match {
+    case "UK" | "GB" => Some(UK) // special case provided for in ISO-3166
+    case GG.code => Some(GG)
+    case IM.code => Some(IM)
+    case JE.code => Some(JE)
+
+    case England.code => Some(England)
+    case Scotland.code => Some(Scotland)
+    case Wales.code => Some(Wales)
+    case NorthernIreland.code => Some(NorthernIreland)
+
+    case _ => None
+  }
+
+  def findByName(name: String): Option[Country] =
+    name match {
+      case UK.name => Some(UK)
+      case GG.name => Some(GG)
+      case IM.name => Some(IM)
+      case JE.name => Some(JE)
+
+      case England.name => Some(England)
+      case Scotland.name => Some(Scotland)
+      case Wales.name => Some(Wales)
+      case NorthernIreland.name => Some(NorthernIreland)
+
+      case _ => None
     }
 }
