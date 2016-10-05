@@ -74,4 +74,8 @@ class DbAddressTest extends FunSuite {
   test("splitPostcode") {
     assert(a1.splitPostcode === Postcode("NE", "30", "4", "HG"))
   }
+
+  test("split location") {
+    assert(a1.latLong === Some(LatLong(1.0, -1.0)))
+  }
 }

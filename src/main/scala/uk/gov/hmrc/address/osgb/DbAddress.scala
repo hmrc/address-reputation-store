@@ -67,6 +67,8 @@ case class DbAddress(
 
   def line3 = if (lines.size > 2) lines(2) else ""
 
+  def latLong: Option[LatLong] = LatLong(location)
+
   // For use as input to MongoDbObject (hence it's not a Map)
   def tupled: List[(String, Any)] = {
     List(
