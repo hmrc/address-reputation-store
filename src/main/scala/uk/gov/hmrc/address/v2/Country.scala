@@ -40,7 +40,7 @@ object Countries {
   val JE = Country("JE", "Jersey")
 
   val England = Country("GB-ENG", "England")
-  val Scotland = Country("GB-SCO", "Scotland")
+  val Scotland = Country("GB-SCT", "Scotland")
   val Wales = Country("GB-WLS", "Wales")
   val NorthernIreland = Country("GB-NIR", "Northern Ireland")
 
