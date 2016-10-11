@@ -35,6 +35,7 @@ case class Country(
 object Countries {
   // note that "GB" is the official ISO code for UK, although "UK" is a reserved synonym and is less confusing
   val UK = Country("UK", "United Kingdom")
+  val GB = Country("GB", "United Kingdom") // special case provided for in ISO-3166
   val GG = Country("GG", "Guernsey")
   val IM = Country("IM", "Isle of Man")
   val JE = Country("JE", "Jersey")
@@ -42,36 +43,14 @@ object Countries {
   val England = Country("GB-ENG", "England")
   val Scotland = Country("GB-SCT", "Scotland")
   val Wales = Country("GB-WLS", "Wales")
+  val Cymru = Country("GB-CYM", "Cymru")
   val NorthernIreland = Country("GB-NIR", "Northern Ireland")
 
-  // TODO this is not good enough - should consult a reference HMG-approved list of countries
-  def find(code: String): Option[Country] =
-    code match {
-      case "UK" | "GB" => Some(UK) // special case provided for in ISO-3166
-      case GG.code => Some(GG)
-      case IM.code => Some(IM)
-      case JE.code => Some(JE)
+  private val all = List(UK, GB, GG, IM, JE, England, Scotland, Wales, Cymru, NorthernIreland)
 
-      case England.code => Some(England)
-      case Scotland.code => Some(Scotland)
-      case Wales.code => Some(Wales)
-      case NorthernIreland.code => Some(NorthernIreland)
+  def find(code: String): Option[Country] = all.find(_.code == code)
 
-      case _ => None
-    }
+  def findByName(name: String): Option[Country] = all.find(_.name == name)
 
-  def findByName(name: String): Option[Country] =
-    name match {
-      case UK.name => Some(UK)
-      case GG.name => Some(GG)
-      case IM.name => Some(IM)
-      case JE.name => Some(JE)
-
-      case England.name => Some(England)
-      case Scotland.name => Some(Scotland)
-      case Wales.name => Some(Wales)
-      case NorthernIreland.name => Some(NorthernIreland)
-
-      case _ => None
-    }
+  // TODO this is possibly not good enough - should consult a reference HMG-approved list of countries
 }
