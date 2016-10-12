@@ -17,6 +17,7 @@
 package uk.gov.hmrc.address.v2
 
 import org.scalatest.FunSuite
+import uk.gov.hmrc.util.JacksonMapper
 
 class AddressRecordTest extends FunSuite {
 
@@ -40,5 +41,12 @@ class AddressRecordTest extends FunSuite {
     val sar = AddressRecord("id", Some(123L), shortAddress, Some(lc1), "en")
     assert(sar.asV1.id === sar.id)
     assert(sar.asV1.address.lines === sar.address.lines)
+  }
+
+  test("json round-trip should preserve all data and should not fail on any synthetic fields") {
+    val sar = AddressRecord("id", Some(123L), shortAddress, Some(lc1), "en")
+    val s = JacksonMapper.writeValueAsString(sar)
+    val x = JacksonMapper.readValue(s, classOf[AddressRecord])
+    assert(x === sar)
   }
 }

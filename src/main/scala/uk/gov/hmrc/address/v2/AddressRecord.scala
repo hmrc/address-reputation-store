@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.address.v2
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import uk.gov.hmrc.address.v1
 
 
@@ -37,6 +38,7 @@ case class AddressRecord(
                           // see https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
                           language: String) {
 
+  @JsonIgnore // needed because the name starts 'is...'
   def isValid = address.isValid && language.length == 2
 
   def truncatedAddress(maxLen: Int = Address.maxLineLength) =

@@ -54,7 +54,8 @@ private object AppDependencies {
     "org.mongodb" %% "casbah" % "3.1.1",
     "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
     "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
-    "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion
+    "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
+    "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion
   )
 
   trait TestDependencies {
