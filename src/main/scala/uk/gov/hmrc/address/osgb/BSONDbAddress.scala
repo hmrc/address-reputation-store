@@ -33,8 +33,9 @@ object BSONDbAddress extends BSONDocumentReader[DbAddress] {
     val logicalState = bson.getAs[Int]("logicalState")
     val streetClass = bson.getAs[Int]("streetClass")
     val blpuClass = bson.getAs[String]("blpuClass")
+    val location = bson.getAs[String]("location")
 
     new DbAddress(id.get, lines.get, town, postcode.get, subdivision, country, localCustodianCode, language,
-      blpuState, logicalState, streetClass, blpuClass, None)
+      blpuState, logicalState, streetClass, blpuClass, location)
   }
 }

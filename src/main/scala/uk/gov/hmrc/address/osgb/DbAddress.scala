@@ -17,6 +17,8 @@
 package uk.gov.hmrc.address.osgb
 
 import java.util
+import java.lang.{Integer => JInteger}
+import java.lang.{Short => JShort}
 
 import uk.gov.hmrc.address.uk.Postcode
 
@@ -82,7 +84,8 @@ case class DbAddress(
       blpuState.toList.map("blpuState" -> _) ++
       logicalState.toList.map("logicalState" -> _) ++
       streetClass.toList.map("streetClass" -> _) ++
-      blpuClass.toList.map("blpuClass" -> _)
+      blpuClass.toList.map("blpuClass" -> _) ++
+      location.toList.map("location" -> _)
   }
 
   // We're still providing two structures for the lines, pending a decision on how ES will be used.
@@ -125,13 +128,13 @@ object DbAddress {
   final val Cymraeg = "cy"
 
   // This is compatible with MongoDBObject.
-  def apply(o: mutable.Map[String, AnyRef]): DbAddress = {
+  def convert(o: mutable.Map[String, AnyRef]): DbAddress = {
     apply(o.toMap)
   }
 
   // This is compatible with Elasticsearch results.
   def apply(fields: Map[String, AnyRef]): DbAddress = {
-    val id = fields.getOrElse("id", fields("_id")).toString
+    val id = fields.get("id").orElse(fields.get("_id")).get.toString
     val linesField = fields.get("lines")
 
     val lines: List[String] = if (linesField.isDefined) {
@@ -163,6 +166,8 @@ object DbAddress {
   private def toInteger(v: Any): Int =
     v match {
       case i: Int => i
+      case o: JInteger => o.toInt
+      case s: JShort => s.toInt
       case _ => v.toString.toInt
     }
 
