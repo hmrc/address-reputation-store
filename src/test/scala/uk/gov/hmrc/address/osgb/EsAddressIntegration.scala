@@ -23,7 +23,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.common.unit.TimeValue
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
-import uk.gov.hmrc.address.services.es.ESSchema
+import uk.gov.hmrc.address.services.es.{ESSchema, ElasticsearchHelper}
 import uk.gov.hmrc.address.uk.Postcode
 import uk.gov.hmrc.util.FileUtils
 
@@ -35,11 +35,7 @@ class EsAddressIntegration extends FunSuite with BeforeAndAfterAll {
 
   val esDataPath = System.getProperty("java.io.tmpdir") + "/es"
 
-  val esSettings = Settings.settingsBuilder()
-    .put("http.enabled", false)
-    .put("path.home", esDataPath)
-
-  lazy val esClient = ElasticClient.local(esSettings.build)
+  lazy val esClient = ElasticsearchHelper.buildDiskClient(esDataPath)
 
   override def beforeAll() {
     FileUtils.deleteDir(new File(esDataPath))
