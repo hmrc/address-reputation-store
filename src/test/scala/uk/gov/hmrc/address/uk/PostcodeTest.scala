@@ -86,4 +86,8 @@ class PostcodeTest extends FunSuite {
   test("urlSafe") {
     assert(Postcode("SK9 1AZ").urlSafe === "SK9+1AZ")
   }
+
+  test("null postcode cannot be cleaned") {
+    assert(Postcode.cleanupPostcode(null) === None)
+  }
 }

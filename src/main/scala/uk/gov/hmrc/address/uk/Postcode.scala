@@ -39,6 +39,11 @@ object Postcode {
     * cannot represent a well-formed postcode.
     */
   def cleanupPostcode(p: String): Option[Postcode] = {
+    if (p == null) None
+    else doCleanupPostcode(p)
+  }
+
+  private def doCleanupPostcode(p: String): Option[Postcode] = {
     val norm = normalisePostcode(p)
     val space = norm.indexOf(' ')
     if (norm.length < 5) None

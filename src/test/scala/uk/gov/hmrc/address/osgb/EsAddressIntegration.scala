@@ -66,9 +66,9 @@ class EsAddressIntegration extends FunSuite with BeforeAndAfterAll {
   }
 
   private def output(a: DbAddress) {
-    val at = a.tupledFlat.toMap + ("id" -> a.id)
+    val tuples = a.forElasticsearch
     esClient execute {
-      index into idx -> doc fields at id a.id routing a.postcode
+      index into idx -> doc fields tuples id a.id routing a.postcode
     }
   }
 
