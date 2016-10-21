@@ -42,7 +42,7 @@ class EsAddressIntegration extends FunSuite with BeforeAndAfterAll {
     esClient execute {
       ESSchema.createIndexDefinition(idx, doc,
         ESSchema.Settings(1, 0, "1s"))
-    } await
+    } await()
 
     waitForIndex(idx)
   }
