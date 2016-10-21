@@ -18,22 +18,21 @@ package uk.gov.hmrc.address.osgb
 
 import java.io.File
 
-import com.sksamuel.elastic4s.{ElasticClient, RichGetResponse, RichSearchResponse}
 import com.sksamuel.elastic4s.ElasticDsl._
-import org.elasticsearch.common.settings.Settings
+import com.sksamuel.elastic4s.{RichGetResponse, RichSearchResponse}
 import org.elasticsearch.common.unit.TimeValue
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import uk.gov.hmrc.address.services.es.{ESSchema, ElasticsearchHelper}
 import uk.gov.hmrc.address.uk.Postcode
 import uk.gov.hmrc.util.FileUtils
 
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 class EsAddressIntegration extends FunSuite with BeforeAndAfterAll {
 
-  val esDataPath = System.getProperty("java.io.tmpdir") + "/es"
+  val esDataPath = System.getProperty("java.io.tmpdir") + "/es-ars"
 
   lazy val esClient = ElasticsearchHelper.buildDiskClient(esDataPath)
 
@@ -75,13 +74,6 @@ class EsAddressIntegration extends FunSuite with BeforeAndAfterAll {
   private def convertSearchResponse(response: RichSearchResponse): List[DbAddress] = {
     response.hits.map(hit => DbAddress(hit.sourceAsMap)).toList
   }
-
-//  private def findID(idStr: String): Future[List[DbAddress]] = {
-//    val getResponse = esClient.execute {
-//      get id idStr from idx -> doc routing "postcode"
-//    }
-//    getResponse map convertGetResponse
-//  }
 
   private def findID(id: String): Future[List[DbAddress]] = {
     val searchResponse = esClient.execute {

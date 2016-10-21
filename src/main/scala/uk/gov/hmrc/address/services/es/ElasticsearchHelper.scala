@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit._
 
 import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.ElasticDsl._
-import org.elasticsearch.action.admin.cluster.health.{ClusterHealthRequest, ClusterHealthResponse}
 import org.elasticsearch.client.transport.{NoNodeAvailableException, TransportClient}
 import org.elasticsearch.cluster.health.ClusterHealthStatus
 import org.elasticsearch.common.settings.Settings
