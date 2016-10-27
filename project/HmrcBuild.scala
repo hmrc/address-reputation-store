@@ -38,18 +38,14 @@ object HmrcBuild extends Build {
 
 private object AppDependencies {
 
-  // Important note: Play is *not* a dependency here, nor is it a transitive dependency.
-  val reactiveMongoVersion = "0.11.8"
-  // Important note: Play is *not* a dependency here, nor is it a transitive dependency.
-
   private val jacksonVersion = "2.7.4"
 
   val compile = Seq(
     // netty 3.10 has a breaking API change
     "io.netty" % "netty" % "3.9.9.Final" force(),
-    "uk.gov.hmrc" %% "reactivemongo" % reactiveMongoVersion withSources(),
-    "uk.gov.hmrc" %% "reactivemongo-bson" % reactiveMongoVersion withSources(),
-    "uk.gov.hmrc" %% "reactivemongo-bson-macros" % reactiveMongoVersion withSources(),
+    "uk.gov.hmrc" %% "reactivemongo" % "0.12.0" withSources(),
+    "uk.gov.hmrc" %% "reactivemongo-bson" % "0.11.8" withSources() force(),
+    "uk.gov.hmrc" %% "reactivemongo-bson-macros" % "0.11.8" withSources() force(),
     "com.univocity" % "univocity-parsers" % "1.5.6" withSources(),
     "com.sksamuel.elastic4s" %% "elastic4s-core" % "2.3.1" excludeAll ExclusionRule(organization = "io.netty"),
     "org.mongodb" %% "casbah" % "3.1.1",
@@ -67,7 +63,7 @@ private object AppDependencies {
   object Test {
     def apply() = new TestDependencies {
       override lazy val test = Seq(
-        "org.scalatest" %% "scalatest" % "2.2.4" % scope,
+        "org.scalatest" %% "scalatest" % "2.2.6" % scope,
         "org.scalacheck" %% "scalacheck" % "1.12.2" % scope,
         "com.github.simplyscala" %% "scalatest-embedmongo" % "0.2.2" % scope,
         "org.pegdown" % "pegdown" % "1.5.0" % scope,
