@@ -53,11 +53,11 @@ class MetadataStoreTest extends WordSpec with EmbeddedMongoSuite {
 
         assert(logger.size === 5, logger.all)
         assert(logger.infos.map(_.message) === List(
-          "Info:Skipped saving keyValue='started' to the admin store.",
-          "Info:Updated keyValue='foo' to the admin store in Mongo.",
-          "Info:Updated keyValue='foo' to the admin store in Mongo.",
-          "Info:Updated keyValue='bar' to the admin store in Mongo.",
-          "Info:Updated keyValue='started' to the admin store in Mongo."
+          "Skipped saving keyValue='started' to the admin store.",
+          "Updated keyValue='foo' to the admin store in Mongo.",
+          "Updated keyValue='foo' to the admin store in Mongo.",
+          "Updated keyValue='bar' to the admin store in Mongo.",
+          "Updated keyValue='started' to the admin store in Mongo."
         ))
       }
 
@@ -106,10 +106,10 @@ class MetadataStoreTest extends WordSpec with EmbeddedMongoSuite {
 
         assert(logger.size === 4, logger.all)
         assert(logger.infos.map(_.message) === List(
-          "Info:Skipped saving dLock='started' to the admin store.",
-          "Info:Updated dLock='foo' to the admin store in Mongo.",
-          "Info:Skipped saving dLock='bar' to the admin store.",
-          "Info:Updated dLock='started' to the admin store in Mongo."
+          "Skipped saving dLock='started' to the admin store.",
+          "Updated dLock='foo' to the admin store in Mongo.",
+          "Skipped saving dLock='bar' to the admin store.",
+          "Updated dLock='started' to the admin store in Mongo."
         ))
       }
     }

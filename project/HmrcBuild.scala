@@ -47,6 +47,7 @@ private object AppDependencies {
   val compile = Seq(
     // netty 3.10 has a breaking API change
     "io.netty" % "netty" % "3.9.9.Final" force(),
+    "uk.gov.hmrc" %% "logging" % "0.2.0" withSources(),
     "uk.gov.hmrc" %% "reactivemongo" % reactiveMongoVersion withSources(),
     "uk.gov.hmrc" %% "reactivemongo-bson" % reactiveMongoVersion withSources(),
     "uk.gov.hmrc" %% "reactivemongo-bson-macros" % reactiveMongoVersion withSources(),
