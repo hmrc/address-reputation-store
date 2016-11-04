@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc
 
+import scala.collection.mutable
+
 package object util {
 
   implicit class Divider(s: String) {
@@ -38,5 +40,25 @@ package object util {
         List(w1, rest)
       }
     }
+  }
+
+  /** Quick split on a single character. Regular expressions are NOT needed here. */
+  def qsplit(s: String, c: Char): List[String] = {
+    val buf = new mutable.ListBuffer[String]
+    val chars = s.toCharArray
+    // n.b. hand-optimised while loop
+    var i = 0
+    var j = 0
+    while (i < chars.length) {
+      if (chars(i) == c) {
+        buf += s.substring(j, i)
+        i += 1
+        j = i
+      } else {
+        i += 1
+      }
+    }
+    buf += s.substring(j)
+    buf.toList
   }
 }
