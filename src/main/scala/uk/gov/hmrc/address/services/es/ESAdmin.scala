@@ -28,17 +28,21 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 
 /** Provides a facade for low-level ES administration operations. */
 trait ESAdmin {
+  def clients: List[ElasticClient]
+
   def indexExists(name: String): Boolean
 
   def existingIndexNames: List[String]
 
   def deleteIndex(name: String)
 
-  def countDocuments(indexName: String, documentName: String): Int
+  def countDocuments(indexName: String, documentName: String): Option[Int]
 
   def getIndexSettings(indexName: String): Map[String, String]
 
   def writeIndexSettings(indexName: String, settings: Map[String, String])
+
+  def shardsAreStable(indexName: String): Boolean
 
   def waitForGreenStatus(indices: String*)
 
@@ -62,7 +66,7 @@ trait ESAdmin {
 
 
 /** Provides a facade for low-level ES administration operations. */
-class ESAdminImpl(val clients: List[ElasticClient], logger: SimpleLogger, ec: ExecutionContext) extends ESAdmin {
+class ESAdminImpl(override val clients: List[ElasticClient], logger: SimpleLogger, ec: ExecutionContext) extends ESAdmin {
 
   private implicit val xec = ec
 
@@ -84,11 +88,15 @@ class ESAdminImpl(val clients: List[ElasticClient], logger: SimpleLogger, ec: Ex
     }
   }
 
-  def countDocuments(indexName: String, documentName: String): Int = {
-    val rCount = clients.head.execute {
-      search in indexName / documentName size 0
+  def countDocuments(indexName: String, documentName: String): Option[Int] = {
+    if (!shardsAreStable(indexName))
+      None // not yet in a steady state
+    else {
+      val n = clients.head.execute {
+        search in indexName / documentName size 0
+      }.await.totalHits
+      Some(n.toInt)
     }
-    rCount.await.totalHits.toInt
   }
 
   def getIndexSettings(indexName: String): Map[String, String] = {
@@ -117,6 +125,11 @@ class ESAdminImpl(val clients: List[ElasticClient], logger: SimpleLogger, ec: Ex
 
       greenHealth(client, healthCheckTimeout, indexName)
     }
+  }
+
+  def shardsAreStable(indexName: String): Boolean = {
+    val indicesStatsResponse = clients.head.admin.indices.prepareStats(indexName).all.execute.actionGet
+    indicesStatsResponse.getTotalShards == indicesStatsResponse.getSuccessfulShards + indicesStatsResponse.getFailedShards
   }
 
   def waitForGreenStatus(indices: String*) {
