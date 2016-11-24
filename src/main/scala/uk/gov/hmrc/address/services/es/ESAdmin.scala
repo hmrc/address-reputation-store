@@ -70,7 +70,7 @@ class ESAdminImpl(override val clients: List[ElasticClient], logger: SimpleLogge
 
   private implicit val xec = ec
 
-  val healthCheckTimeout = TimeValue.timeValueMinutes(10)
+  val healthCheckTimeout: TimeValue = TimeValue.timeValueMinutes(10)
 
   def indexExists(name: String): Boolean = existingIndexNames.contains(name)
 

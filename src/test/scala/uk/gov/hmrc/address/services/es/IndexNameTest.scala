@@ -20,14 +20,14 @@ import org.scalatest.FunSuite
 
 class IndexNameTest extends FunSuite {
 
-  test("format IndexName") {
+  test("format IndexName using toString") {
     assert(IndexName("fooey", Some(1), Some("ts2")).toString === "fooey_1_ts2")
     assert(IndexName("fooey", Some(40), Some("ts13")).toString === "fooey_40_ts13")
     assert(IndexName("fooey", Some(40), None).toString === "fooey_40")
     assert(IndexName("fooey", None, None).toString === "fooey")
   }
 
-  test("IndexName prefix") {
+  test("IndexName toPrefix") {
     assert(IndexName("fooey", Some(1), Some("ts2")).toPrefix === "fooey_1")
     assert(IndexName("fooey", Some(40), None).toPrefix === "fooey_40")
   }

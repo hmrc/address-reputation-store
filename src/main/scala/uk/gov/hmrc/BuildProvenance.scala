@@ -14,26 +14,6 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.address.services.writers
+package uk.gov.hmrc
 
-import java.util.Date
-
-import uk.gov.hmrc.address.osgb.DbAddress
-
-trait OutputWriter {
-  def existingTargetThatIsNewerThan(date: Date): Option[String]
-
-  def begin()
-
-  def output(a: DbAddress)
-
-  // result is 'hasFailed' flag
-  def end(completed: Boolean): Boolean
-}
-
-
-case class WriterSettings(bulkSize: Int, loopDelay: Int, algorithm: Algorithm)
-
-object WriterSettings {
-  val default = WriterSettings(1, 0, Algorithm.default)
-}
+case class BuildProvenance(version: Option[String], number: Option[String])

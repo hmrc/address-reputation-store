@@ -20,13 +20,11 @@ import uk.gov.hmrc.util._
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 
-// Normal collections will have all fields defined.
-// However, we allow for absent fields primarily for backward compatibility.
-
 trait IndexState {
   def productName: String
   def epoch: Option[Int]
   def timestamp: Option[String]
+  def toPrefix: String
 }
 
 
@@ -46,10 +44,10 @@ case class IndexName(productName: String,
 
 
 object IndexName {
-  def apply(collectionName: String): Option[IndexName] =
-    if (collectionName.isEmpty) None
+  def apply(name: String): Option[IndexName] =
+    if (name.isEmpty) None
     else {
-      val parts = qsplit(collectionName, '_')
+      val parts = qsplit(name, '_')
       if (parts.size <= 3) doParseName(parts) else None
     }
 
@@ -65,7 +63,7 @@ object IndexName {
 
   def format(productName: String, epoch: Int, timestamp: String): String = "%s_%d_%s".format(productName, epoch, timestamp)
 
-  def newTimestamp = timestampFormatter.print(new DateTime())
+  def newTimestamp: String = timestampFormatter.print(new DateTime())
 
   // note: no underscores (would break our logic) and no dashes (they are problematic in Mongo)
   val timestampFormatter = DateTimeFormat.forPattern("yyyyMMddHHmm")
