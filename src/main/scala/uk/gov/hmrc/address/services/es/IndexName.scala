@@ -18,13 +18,14 @@ package uk.gov.hmrc.address.services.es
 
 import uk.gov.hmrc.util._
 import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 
 trait IndexState {
   def productName: String
   def epoch: Option[Int]
   def timestamp: Option[String]
   def toPrefix: String
+  def formattedName: String
 }
 
 
@@ -34,12 +35,14 @@ case class IndexName(productName: String,
 
   def toPrefix: String = s"${productName}_${epoch.get}"
 
-  override lazy val toString: String =
+  override lazy val formattedName: String =
     if (timestamp.isDefined) IndexName.format(productName, epoch.get, timestamp.get)
     else if (epoch.isDefined) toPrefix
     else productName
 
-  override def compare(that: IndexName): Int = this.toString compare that.toString
+  override def toString: String = formattedName
+
+  override def compare(that: IndexName): Int = this.formattedName compare that.formattedName
 }
 
 
@@ -66,5 +69,5 @@ object IndexName {
   def newTimestamp: String = timestampFormatter.print(new DateTime())
 
   // note: no underscores (would break our logic) and no dashes (they are problematic in Mongo)
-  val timestampFormatter = DateTimeFormat.forPattern("yyyyMMddHHmm")
+  private val timestampFormatter = DateTimeFormat.forPattern("yyyyMMddHHmm")
 }

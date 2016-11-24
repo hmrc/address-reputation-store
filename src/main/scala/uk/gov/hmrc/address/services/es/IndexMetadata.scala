@@ -55,10 +55,16 @@ class IndexMetadata(esAdmin: ESAdmin, val isCluster: Boolean, numShardsMap: Map[
 
   def clients: List[ElasticClient] = esAdmin.clients
 
+  def indexExists(name: IndexState): Boolean = esAdmin.indexExists(name.formattedName)
+
+  def deleteIndex(name: IndexState) {
+    esAdmin.deleteIndex(name.formattedName)
+  }
+
   //-------------------- Core methods --------------------
 
   def deleteIndexIfExists(name: IndexState) {
-    val s = name.toString
+    val s = name.formattedName
     if (esAdmin.indexExists(s)) {
       esAdmin.deleteIndex(s)
     }
@@ -89,7 +95,7 @@ class IndexMetadata(esAdmin: ESAdmin, val isCluster: Boolean, numShardsMap: Map[
   }
 
   def findMetadata(name: IndexName): Option[IndexMetadataItem] = {
-    val index = name.toString
+    val index = name.formattedName
     val count = esAdmin.countDocuments(index, address)
     val settings = esAdmin.getIndexSettings(index)
 
@@ -111,13 +117,13 @@ class IndexMetadata(esAdmin: ESAdmin, val isCluster: Boolean, numShardsMap: Map[
   }
 
   def writeCompletionDateTo(indexName: IndexState, date: Date = new Date()) {
-    esAdmin.writeIndexSettings(indexName.toString, Map(iCompletedAt -> date.getTime.toString))
+    esAdmin.writeIndexSettings(indexName.formattedName, Map(iCompletedAt -> date.getTime.toString))
   }
 
   def writeIngestSettingsTo(indexName: IndexState, writerSettings: WriterSettings, provenance: BuildProvenance) {
     val buildVersion = provenance.version.map(iBuildVersion -> _)
     val buildNumber = provenance.number.map(iBuildNumber -> _)
-    esAdmin.writeIndexSettings(indexName.toString,
+    esAdmin.writeIndexSettings(indexName.formattedName,
       Map(
         iBulkSize -> writerSettings.bulkSize.toString,
         iLoopDelay -> writerSettings.loopDelay.toString,
@@ -130,7 +136,7 @@ class IndexMetadata(esAdmin: ESAdmin, val isCluster: Boolean, numShardsMap: Map[
   }
 
   def setIndexInUse(name: IndexName) {
-    val newIndexName = name.toString
+    val newIndexName = name.formattedName
     val productName = name.productName
 
     if (isCluster) {

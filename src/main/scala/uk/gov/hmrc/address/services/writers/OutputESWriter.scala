@@ -32,7 +32,7 @@ class OutputESWriter(model: IndexState, statusLogger: SimpleLogger, indexMetadat
 
   private implicit val x = ec
   private val address = IndexMetadata.address
-  private val indexName = model.toString
+  private val indexName = model.formattedName
   private var hasFailed = false
 
   override def existingTargetThatIsNewerThan(date: Date): Option[String] = {
@@ -42,7 +42,7 @@ class OutputESWriter(model: IndexState, statusLogger: SimpleLogger, indexMetadat
         val info = indexMetadata.findMetadata(name)
         info.exists(_.completedAfter(date))
     }
-    found.map(_.toString)
+    found.map(_.formattedName)
   }
 
   override def begin() {

@@ -27,7 +27,7 @@ case class Algorithm(
 
   def preferLPI: Boolean = !preferDPA
 
-  def prefer: String = if (preferLPI) Algorithm.LPI else Algorithm.DPA
+  def prefer: String = if (preferDPA) Algorithm.DPA else Algorithm.LPI
 }
 
 
