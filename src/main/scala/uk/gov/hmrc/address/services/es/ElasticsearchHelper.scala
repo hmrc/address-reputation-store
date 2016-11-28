@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.address.services.es
 
+import java.io.File
 import java.util.concurrent.TimeUnit._
 
 import com.sksamuel.elastic4s.ElasticClient
@@ -25,6 +26,7 @@ import org.elasticsearch.cluster.health.ClusterHealthStatus
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.common.transport.LocalTransportAddress
 import uk.gov.hmrc.logging.SimpleLogger
+import uk.gov.hmrc.util.FileUtils
 
 import scala.concurrent.duration.Duration
 
@@ -34,21 +36,17 @@ object ElasticsearchHelper {
   def buildClients(settings: ElasticSettings, logger: SimpleLogger): List[ElasticClient] = {
     if (settings.netClient.isDefined)
       buildNetClients(settings.netClient.get, logger)
-    else if (settings.homeDir.isDefined)
-      List(buildDiskClient(settings.homeDir.get))
+    else if (settings.diskClient.isDefined)
+      List(buildDiskClient(settings.diskClient.get))
     else
       List(buildNodeLocalClient())
   }
 
-  def buildNetClients(settings: ElasticNetClientSettings, logger: SimpleLogger): List[ElasticClient] = {
-    buildNetClients(settings.clusterName, settings.connectionString, logger)
-  }
-
   /** Normal client suite (for production). */
-  def buildNetClients(clusterName: String, connectionString: String, logger: SimpleLogger): List[ElasticClient] = {
-    val esSettings = Settings.settingsBuilder().put("cluster.name", clusterName).build()
+  def buildNetClients(settings: ElasticNetClientSettings, logger: SimpleLogger): List[ElasticClient] = {
+    val esSettings = Settings.settingsBuilder().put("cluster.name", settings.clusterName).build()
 
-    connectionString.split("\\+").toList.map {
+    settings.connectionString.split("\\+").toList.map {
       uri =>
         checkStatus(ElasticClient.transport(esSettings, uri), logger)
     }
@@ -70,10 +68,15 @@ object ElasticsearchHelper {
   }
 
   /** Disk-based local storage without network port (e.g. for unit testing). */
-  def buildDiskClient(homeDir: String): ElasticClient = {
+  def buildDiskClient(settings: ElasticDiskClientSettings): ElasticClient = {
+    val esHomePath = new File(settings.homeDir)
+    if (settings.preDelete)
+      FileUtils.deleteDir(esHomePath)
+    esHomePath.mkdirs()
+
     val esSettings = Settings.settingsBuilder()
       .put("http.enabled", false)
-      .put("path.home", homeDir)
+      .put("path.home", settings.homeDir)
 
     ElasticClient.local(esSettings.build)
   }

@@ -21,7 +21,12 @@ case class ElasticNetClientSettings(connectionString: String,
                                     clusterName: String,
                                     numShards: Map[String, Int])
 
-case class ElasticSettings(homeDir: Option[String] = None,
+
+case class ElasticDiskClientSettings(homeDir: String,
+                                     preDelete: Boolean)
+
+
+case class ElasticSettings(diskClient: Option[ElasticDiskClientSettings] = None,
                            netClient: Option[ElasticNetClientSettings] = None) {
 
   def isCluster: Boolean = netClient.isDefined && netClient.get.isCluster
@@ -29,9 +34,15 @@ case class ElasticSettings(homeDir: Option[String] = None,
 
 
 object ElasticSettings {
-  def diskClient(homeDir: String): ElasticSettings = ElasticSettings(homeDir = Some(homeDir))
+  def apply(localMode: Boolean,
+            homeDir: Option[String], preDelete: Boolean,
+            connectionString: String, isCluster: Boolean, clusterName: String, numShards: Map[String, Int]): ElasticSettings =
+    if (localMode)
+      ElasticSettings(None, None)
 
-  def apply(localMode: Boolean, connectionString: String, isCluster: Boolean, clusterName: String, numShards: Map[String, Int]): ElasticSettings =
-    if (localMode) ElasticSettings(None, None)
-    else ElasticSettings(netClient = Some(ElasticNetClientSettings(connectionString, isCluster, clusterName, numShards)))
+    else if (homeDir.isDefined)
+      ElasticSettings(diskClient = Some(ElasticDiskClientSettings(homeDir.get, preDelete)))
+
+    else
+      ElasticSettings(netClient = Some(ElasticNetClientSettings(connectionString, isCluster, clusterName, numShards)))
 }
