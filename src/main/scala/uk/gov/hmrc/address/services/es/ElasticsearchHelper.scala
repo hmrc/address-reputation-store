@@ -31,6 +31,19 @@ import scala.concurrent.duration.Duration
 // allows construction without loading Play
 object ElasticsearchHelper {
 
+  def buildClients(settings: ElasticSettings, logger: SimpleLogger): List[ElasticClient] = {
+    if (settings.netClient.isDefined)
+      buildNetClients(settings.netClient.get, logger)
+    else if (settings.homeDir.isDefined)
+      List(buildDiskClient(settings.homeDir.get))
+    else
+      List(buildNodeLocalClient())
+  }
+
+  def buildNetClients(settings: ElasticNetClientSettings, logger: SimpleLogger): List[ElasticClient] = {
+    buildNetClients(settings.clusterName, settings.connectionString, logger)
+  }
+
   /** Normal client suite (for production). */
   def buildNetClients(clusterName: String, connectionString: String, logger: SimpleLogger): List[ElasticClient] = {
     val esSettings = Settings.settingsBuilder().put("cluster.name", clusterName).build()
