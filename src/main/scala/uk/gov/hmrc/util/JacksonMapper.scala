@@ -17,12 +17,19 @@
 package uk.gov.hmrc.util
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
+import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 
-object JacksonMapper extends ObjectMapper {
+trait JacksonMapper extends ObjectMapper {
   configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
   registerModule(DefaultScalaModule)
   setSerializationInclusion(JsonInclude.Include.NON_ABSENT)
+}
+
+object JacksonMapper extends JacksonMapper
+
+// Primary useful for diagnostics
+object PrettyMapper extends JacksonMapper {
+  configure(SerializationFeature.INDENT_OUTPUT, true)
 }
 
