@@ -44,7 +44,10 @@ object ElasticsearchHelper {
 
   /** Normal client suite (for production). */
   def buildNetClients(settings: ElasticNetClientSettings, logger: SimpleLogger): List[ElasticClient] = {
-    val esSettings = Settings.settingsBuilder().put("cluster.name", settings.clusterName).build()
+    val esSettings = Settings.settingsBuilder()
+      .put("cluster.name", settings.clusterName)
+      .put("node.name", "address-lookup-client")
+      .build()
 
     settings.connectionString.split("\\+").toList.map {
       uri =>
