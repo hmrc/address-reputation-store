@@ -34,9 +34,17 @@ class AddressTest extends FunSuite {
       List("1", "2", "town", "county", "FX1 1ZZ"))
   }
 
+  test("longestLineLength") {
+    assert(Address(List("a123456789 123456789", "b"), Some("c"), Some("d"), "FX1 1ZZ", Some(England), UK).longestLineLength === 20)
+    assert(Address(List("a", "b123456789 123456789"), Some("c"), Some("d"), "FX1 1ZZ", Some(England), UK).longestLineLength === 20)
+    assert(Address(List("a", "b"), Some("c123456789 123456789"), Some("d"), "FX1 1ZZ", Some(England), UK).longestLineLength === 20)
+    assert(Address(List("a", "b"), Some("c"), Some("d123456789 123456789"), "FX1 1ZZ", Some(England), UK).longestLineLength === 20)
+    assert(Address(List("a", "b"), Some("c"), Some("d"), "FX1 1ZZ", Some(England), UK).longestLineLength === 7)
+  }
+
   val shortAddress = Address(List("1", "2"), Some("town"), Some("county"), "FX1 1ZZ", Some(England), UK)
-  val longAddress = Address(List("a23456789 123456789", "b23456789 123456789"), Some("c23456789 123456789"), Some("d123456789 123456789"),
-    "FX1 1ZZ", Some(England), UK)
+  val longAddress = Address(List("a23456789 123456789", "b23456789 123456789"), Some("c23456789 123456789"), Some("d123456789 123456789"), "FX1 1ZZ", Some(England), UK)
+  val ne15xdAr = Address(List("10 Taylors Court", "Monk Street", "Byker"), Some("Newcastle upon Tyne"), Some("Tyne & Wear"), "NE1 5XD", Some(England), UK)
 
   test("truncatedAddress") {
     assert(
@@ -46,5 +54,15 @@ class AddressTest extends FunSuite {
     assert(
       longAddress.truncatedAddress(12) ===
         Address(List("a23456789 12", "b23456789 12"), Some("c23456789 12"), Some("d123456789"), "FX1 1ZZ", Some(England), UK))
+  }
+
+  test("asInternational") {
+    assert(
+      longAddress.asInternational ===
+        International(List("a23456789 123456789", "b23456789 123456789", "c23456789 123456789", "d123456789 123456789", "England"), Some("FX1 1ZZ"), Some(UK)))
+
+    assert(
+      ne15xdAr.asInternational ===
+        International(List("10 Taylors Court", "Monk Street", "Byker", "Newcastle upon Tyne", "Tyne & Wear", "England"), Some("NE1 5XD"), Some(UK)))
   }
 }

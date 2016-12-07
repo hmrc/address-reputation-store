@@ -33,8 +33,10 @@ case class Address(lines: List[String],
                    subdivision: Option[Country],
                    country: Country) {
 
+  import Address._
+
   @JsonIgnore // needed because the name starts 'is...'
-  def isValid = lines.nonEmpty && lines.size <= (if (town.isEmpty) 4 else 3)
+  def isValid: Boolean = lines.nonEmpty && lines.size <= (if (town.isEmpty) 4 else 3)
 
   def nonEmptyFields: List[String] = lines ::: town.toList ::: county.toList ::: List(postcode)
 
@@ -45,17 +47,30 @@ case class Address(lines: List[String],
   @JsonIgnore // needed because it's a field
   lazy val printable: String = printable(", ")
 
-  def line1 = if (lines.nonEmpty) lines.head else ""
+  def line1: String = if (lines.nonEmpty) lines.head else ""
 
-  def line2 = if (lines.size > 1) lines(1) else ""
+  def line2: String = if (lines.size > 1) lines(1) else ""
 
-  def line3 = if (lines.size > 2) lines(2) else ""
+  def line3: String = if (lines.size > 2) lines(2) else ""
 
-  def line4 = if (lines.size > 3) lines(3) else ""
+  def line4: String = if (lines.size > 3) lines(3) else ""
 
-  def longestLineLength = nonEmptyFields.map(_.length).max
+  def longestLineLength: Int = nonEmptyFields.map(_.length).max
 
-  private def limit(str: String, max: Int): String = {
+  def truncatedAddress(maxLen: Int = maxLineLength): Address =
+    Address(lines.map(limit(_, maxLen)), town.map(limit(_, maxLen)), county.map(limit(_, maxLen)), postcode, subdivision, country)
+
+  def asV1 = v1.Address(lines, town, county, postcode, subdivision.map(_.code), country.asV1)
+
+  def asInternational = International(lines ::: town.toList ::: county.toList ::: subdivision.map(_.name).toList, Some(postcode), Some(country))
+}
+
+
+object Address {
+  val maxLineLength = 35
+  val danglingLetter: Pattern = Pattern.compile(".* [A-Z0-9]$")
+
+  private[v2] def limit(str: String, max: Int): String = {
     var s = str
     while (s.length > max && s.indexOf(", ") > 0) {
       s = s.replaceFirst(", ", ",")
@@ -69,15 +84,4 @@ case class Address(lines: List[String],
     }
     else s
   }
-
-  def truncatedAddress(maxLen: Int = Address.maxLineLength): Address =
-    Address(lines.map(limit(_, maxLen)), town.map(limit(_, maxLen)), county.map(limit(_, maxLen)), postcode, subdivision, country)
-
-  def asV1 = v1.Address(lines, town, county, postcode, subdivision.map(_.code), country.asV1)
-}
-
-
-object Address {
-  val maxLineLength = 35
-  val danglingLetter = Pattern.compile(".* [A-Z0-9]$")
 }
