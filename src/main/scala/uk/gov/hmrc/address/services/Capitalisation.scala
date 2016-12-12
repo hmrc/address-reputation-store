@@ -39,13 +39,19 @@ object Capitalisation {
 
   private def asFirstWord(word: String): String = {
     val dashedPhrase = splitOnDash(word)
-    if (dashedPhrase.nonEmpty) joinDashedWords(dashedPhrase.head.capitalize, dashedPhrase.tail) else "-"
+    if (dashedPhrase.nonEmpty) joinDashedWords(capitaliseFirstSubword(dashedPhrase.head), dashedPhrase.tail) else "-"
   }
 
   private def asOtherWord(word: String): String = {
     val dashedPhrase = splitOnDash(word)
     if (dashedPhrase.nonEmpty) joinDashedWords(capitaliseRestOfSubwords(dashedPhrase.head), dashedPhrase.tail) else "-"
   }
+
+  private def capitaliseFirstSubword(word: String): String =
+    acronymSpecialCases.get(word) match {
+      case Some(specialCase) => specialCase
+      case None => word.capitalize
+    }
 
   private def capitaliseRestOfSubwords(word: String): String =
     if (stopWords.contains(word)) word else capitaliseSpecialCases(word)
@@ -80,6 +86,10 @@ object Capitalisation {
 
   private val contractedPrefixes = HashSet("a'", "d'", "o'")
 
-  private val subwordSpecialCases = Map("i'anson" -> "I'Anson") // DL3 0RL
+  private val subwordSpecialCases = Map(
+    "i'anson" -> "I'Anson") // DL3 0RL
+
+  private val acronymSpecialCases = Map(
+    "bfpo" -> "BFPO")
 
 }

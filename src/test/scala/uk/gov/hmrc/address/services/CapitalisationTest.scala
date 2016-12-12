@@ -74,6 +74,14 @@ class CapitalisationTest extends FunSuite {
   }
 
   test(
+    """Given a street name starting with 'The',
+      when normalised,
+      then the definite article should be capitalised.
+    """) {
+    tryNormaliseAddressLine("The Copse")
+  }
+
+  test(
     """Given a town in uppercase or lowercase and includes dashes,
       when normalised,
       then the town should be proper case
@@ -149,6 +157,14 @@ class CapitalisationTest extends FunSuite {
       then the name should be proper case
     """) {
     tryNormaliseAddressLine("R D Taylor & Co Ltd")
+  }
+
+  test(
+    """Given a special-case acronym,
+      when normalised,
+      then the acronym should be all-uppercase
+    """) {
+    tryNormaliseAddressLine("BFPO")
   }
 
 }
