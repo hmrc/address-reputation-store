@@ -28,23 +28,24 @@ class AddressRecordTest extends FunSuite {
   val longAddress = Address(List("a23456789 123456789", "b23456789 123456789"), Some("c23456789 123456789"), Some("d123456789 123456789"),
     "FX1 1ZZ", Some(England), UK)
 
+  val sar = AddressRecord("id", Some(123L), shortAddress, "en", Some(lc1),
+    Some(BLPUState.In_Use), Some(LogicalState.Approved), Some(StreetClassification.All_Vehicles))
+
+  val lar = AddressRecord("id", Some(456L), longAddress, "en", Some(lc1),
+    Some(BLPUState.In_Use), Some(LogicalState.Approved), Some(StreetClassification.All_Vehicles))
+
   test("truncatedAddress") {
-    val sar = AddressRecord("id", Some(123L), shortAddress, Some(lc1), "en")
     assert(sar.truncatedAddress(30) === sar)
 
-    val lar = AddressRecord("id", Some(456L), longAddress, Some(lc1), "en")
-    assert(
-      lar.truncatedAddress(12) === AddressRecord("id", Some(456L), longAddress.truncatedAddress(12), Some(lc1), "en"))
+    assert(lar.truncatedAddress(12) === AddressRecord("id", Some(456L), longAddress.truncatedAddress(12), "en", Some(lc1), None, None, None))
   }
 
   test("asV1") {
-    val sar = AddressRecord("id", Some(123L), shortAddress, Some(lc1), "en")
     assert(sar.asV1.id === sar.id)
     assert(sar.asV1.address.lines === sar.address.lines)
   }
 
   test("json round-trip should preserve all data and should not fail on any synthetic fields") {
-    val sar = AddressRecord("id", Some(123L), shortAddress, Some(lc1), "en")
     val s = JacksonMapper.writeValueAsString(sar)
     val x = JacksonMapper.readValue(s, classOf[AddressRecord])
     assert(x === sar)

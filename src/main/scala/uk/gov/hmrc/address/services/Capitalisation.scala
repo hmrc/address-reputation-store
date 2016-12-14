@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.address.services
 
+import java.util.regex.Pattern
+
 import scala.collection.immutable.HashSet
 
 
@@ -24,9 +26,13 @@ object Capitalisation {
   def normaliseAddressLine(line: String): String = normalise(line.trim.toLowerCase)
 
   private def normalise(phrase: String): String = {
-    val words: Seq[String] = phrase.split(' ').filterNot(_ == "")
-
+    val words = phrase.split(' ').filterNot(_ == "")
     if (words.isEmpty) ""
+    else normaliseWords(words)
+  }
+
+  private def normaliseWords(words: Seq[String]): String = {
+    if (isHouseNumber(words.head)) words.head + " " + normaliseWords(words.tail)
     else if (words.length == 1) asFirstWord(words.head)
     else asFirstWord(words.head) + words.tail.map(asOtherWord).mkString(" ", " ", "")
   }
@@ -48,7 +54,7 @@ object Capitalisation {
   }
 
   private def capitaliseFirstSubword(word: String): String =
-    acronymSpecialCases.get(word) match {
+    specialCases.get(word) match {
       case Some(specialCase) => specialCase
       case None => word.capitalize
     }
@@ -57,7 +63,7 @@ object Capitalisation {
     if (stopWords.contains(word)) word else capitaliseSpecialCases(word)
 
   private def capitaliseSpecialCases(lcWord: String): String =
-    subwordSpecialCases.get(lcWord) match {
+    specialCases.get(lcWord) match {
       case Some(specialCase) => specialCase
       case None => capitaliseWithContractedPrefix(lcWord)
     }
@@ -69,6 +75,10 @@ object Capitalisation {
       if (contractedPrefixes.contains(two)) two.capitalize + word.substring(2).capitalize
       else word.capitalize
     }
+
+  private val houseNumber = Pattern.compile("[1-9][-0-9A-Z]*")
+
+  private def isHouseNumber(word: String) = houseNumber.matcher(word).matches
 
   //-----------------------------------------------------------------------------------------------
 
@@ -86,10 +96,9 @@ object Capitalisation {
 
   private val contractedPrefixes = HashSet("a'", "d'", "o'")
 
-  private val subwordSpecialCases = Map(
-    "i'anson" -> "I'Anson") // DL3 0RL
-
-  private val acronymSpecialCases = Map(
-    "bfpo" -> "BFPO")
+  private val specialCases = Map(
+    "i'anson" -> "I'Anson", // DL3 0RL
+    "bfpo" -> "BFPO"
+  )
 
 }

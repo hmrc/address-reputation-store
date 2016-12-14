@@ -33,17 +33,20 @@ case class AddressRecord(
                           id: String,
                           uprn: Option[Long],
                           address: Address,
-                          localCustodian: Option[LocalCustodian],
                           // ISO639-1 code, e.g. 'en' for English
                           // see https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
-                          language: String) {
+                          language: String,
+                          localCustodian: Option[LocalCustodian],
+                          blpuState: Option[BLPUState],
+                          logicalState: Option[LogicalState],
+                          streetClassification: Option[StreetClassification]) {
 
   @JsonIgnore // needed because the name starts 'is...'
   def isValid = address.isValid && language.length == 2
 
   def truncatedAddress(maxLen: Int = Address.maxLineLength) =
     if (address.longestLineLength <= maxLen) this
-    else AddressRecord(id, uprn, address.truncatedAddress(maxLen), localCustodian, language)
+    else AddressRecord(id, uprn, address.truncatedAddress(maxLen), language, localCustodian, None, None, None)
 
   def asV1 = v1.AddressRecord(id, uprn, address.asV1, localCustodian.map(_.asV1), language)
 }
