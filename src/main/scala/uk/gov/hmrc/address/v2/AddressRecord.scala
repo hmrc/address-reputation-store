@@ -37,16 +37,22 @@ case class AddressRecord(
                           // see https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
                           language: String,
                           localCustodian: Option[LocalCustodian],
-                          blpuState: Option[BLPUState],
-                          logicalState: Option[LogicalState],
-                          streetClassification: Option[StreetClassification]) {
+                          blpuState: Option[String],
+                          logicalState: Option[String],
+                          streetClassification: Option[String]) {
 
   @JsonIgnore // needed because the name starts 'is...'
-  def isValid = address.isValid && language.length == 2
+  def isValid: Boolean = address.isValid && language.length == 2
 
-  def truncatedAddress(maxLen: Int = Address.maxLineLength) =
+  def truncatedAddress(maxLen: Int = Address.maxLineLength): AddressRecord =
     if (address.longestLineLength <= maxLen) this
     else AddressRecord(id, uprn, address.truncatedAddress(maxLen), language, localCustodian, None, None, None)
 
   def asV1 = v1.AddressRecord(id, uprn, address.asV1, localCustodian.map(_.asV1), language)
+
+  def blpuStateValue: Option[BLPUState] = blpuState.flatMap(v => Option(BLPUState.valueOf(v)))
+
+  def logicalStateValue: Option[LogicalState] = logicalState.flatMap(v => Option(LogicalState.valueOf(v)))
+
+  def streetClassificationValue: Option[StreetClassification] = streetClassification.flatMap(v => Option(StreetClassification.valueOf(v)))
 }

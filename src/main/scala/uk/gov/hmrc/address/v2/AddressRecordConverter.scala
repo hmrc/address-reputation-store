@@ -38,11 +38,11 @@ object AddressRecordConverter {
 
     val a = new Address(d.lines, d.town, optCounty, d.postcode, optSubdivision, country)
 
-    val blpuState = if (incMetadata) d.blpuState.flatMap(c => Option(BLPUState.lookup(c))) else None
+    val blpuState = if (incMetadata) d.blpuState.flatMap(BLPUStateHelper.codeToString) else None
 
-    val logicalState = if (incMetadata) d.logicalState.flatMap(c => Option(LogicalState.lookup(c))) else None
+    val logicalState = if (incMetadata) d.logicalState.flatMap(LogicalStateHelper.codeToString) else None
 
-    val streetClassification = if (incMetadata) d.streetClass.flatMap(c => Option(StreetClassification.lookup(c))) else None
+    val streetClassification = if (incMetadata) d.streetClass.flatMap(StreetClassificationHelper.codeToString) else None
 
     new AddressRecord(d.id, Some(d.uprn), a, language, optLC, blpuState, logicalState, streetClassification)
   }

@@ -17,7 +17,7 @@ public enum BLPUState {
     }
 
     public static BLPUState lookup(int code) {
-        for (BLPUState v: values()) {
+        for (BLPUState v : values()) {
             if (v.code == code) return v;
         }
         return null;

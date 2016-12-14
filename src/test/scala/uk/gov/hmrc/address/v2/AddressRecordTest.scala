@@ -29,10 +29,10 @@ class AddressRecordTest extends FunSuite {
     "FX1 1ZZ", Some(England), UK)
 
   val sar = AddressRecord("id", Some(123L), shortAddress, "en", Some(lc1),
-    Some(BLPUState.In_Use), Some(LogicalState.Approved), Some(StreetClassification.All_Vehicles))
+    Some(BLPUState.In_Use.name), Some(LogicalState.Approved.name), Some(StreetClassification.All_Vehicles.name))
 
   val lar = AddressRecord("id", Some(456L), longAddress, "en", Some(lc1),
-    Some(BLPUState.In_Use), Some(LogicalState.Approved), Some(StreetClassification.All_Vehicles))
+    Some(BLPUState.In_Use.name), Some(LogicalState.Approved.name), Some(StreetClassification.All_Vehicles.name))
 
   test("truncatedAddress") {
     assert(sar.truncatedAddress(30) === sar)

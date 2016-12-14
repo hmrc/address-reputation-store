@@ -50,7 +50,7 @@ class AddressRecordConverterTest extends FunSuite {
     assert(adr === AddressRecord(
       "GB4510123533", Some(4510123533L), Address(List("10 Taylors Court", "1 Monk Street"),
         NewcastleUponTyne, None, "NE1 5XD", Some(England), UK), "en", None,
-      Some(BLPUState.In_Use), Some(LogicalState.Approved), Some(StreetClassification.All_Vehicles)
+      Some(BLPUState.In_Use.name), Some(LogicalState.Approved.name), Some(StreetClassification.All_Vehicles.name)
     ))
   }
 
@@ -77,7 +77,7 @@ class AddressRecordConverterTest extends FunSuite {
     assert(adr === AddressRecord(
       "GB4510123533", Some(4510123533L), Address(List("10 Taylors Court", "1 Monk Street"),
         NewcastleUponTyne, TyneAndWear, "NE1 5XD", Some(England), UK), "en", Some(lc4510),
-      Some(BLPUState.In_Use), Some(LogicalState.Approved), Some(StreetClassification.All_Vehicles)
+      Some(BLPUState.In_Use.name), Some(LogicalState.Approved.name), Some(StreetClassification.All_Vehicles.name)
     ))
   }
 
