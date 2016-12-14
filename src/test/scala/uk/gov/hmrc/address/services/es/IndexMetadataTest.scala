@@ -20,7 +20,7 @@ import java.util.Date
 
 import org.mockito.Mockito._
 import org.scalatest.WordSpec
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import uk.gov.hmrc.BuildProvenance
 import uk.gov.hmrc.address.services.writers.{Algorithm, WriterSettings}
 import uk.gov.hmrc.logging.StubLogger
