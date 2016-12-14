@@ -18,31 +18,31 @@ package uk.gov.hmrc.address.v2
 
 object BLPUStateHelper {
 
-  def valueToEnum[BLPUState](value: String) = Option(BLPUState.valueOf(value))
+  def valueToEnum(value: String) = Option(BLPUState.valueOf(value))
 
-  def codeToEnum[BLPUState](code: Int) = Option(BLPUState.lookup(code))
+  def codeToEnum(code: Int) = Option(BLPUState.lookup(code))
 
-  def codeToString[BLPUState](code: Int): Option[String] = codeToEnum(code).map(_.name)
+  def codeToString(code: Int): Option[String] = codeToEnum(code).map(_.name)
 }
 
 
 object LogicalStateHelper {
 
-  def valueToEnum[LogicalState](value: String) = Option(LogicalState.valueOf(value))
+  def valueToEnum(value: String) = Option(LogicalState.valueOf(value))
 
-  def codeToEnum[LogicalState](code: Int) = Option(LogicalState.lookup(code))
+  def codeToEnum(code: Int) = Option(LogicalState.lookup(code))
 
-  def codeToString[LogicalState](code: Int): Option[String] = codeToEnum(code).map(_.name)
+  def codeToString(code: Int): Option[String] = codeToEnum(code).map(_.name)
 }
 
 
 object StreetClassificationHelper {
 
-  def valueToEnum[StreetClassification](value: String) = Option(StreetClassification.valueOf(value))
+  def valueToEnum(value: String) = Option(StreetClassification.valueOf(value))
 
-  def codeToEnum[StreetClassification](code: Int) = Option(StreetClassification.lookup(code))
+  def codeToEnum(code: Int) = Option(StreetClassification.lookup(code))
 
-  def codeToString[StreetClassification](code: Int): Option[String] = codeToEnum(code).map(_.name)
+  def codeToString(code: Int): Option[String] = codeToEnum(code).map(_.name)
 }
 
 
