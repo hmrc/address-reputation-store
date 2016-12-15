@@ -37,7 +37,12 @@ class AddressRecordTest extends FunSuite {
   test("truncatedAddress") {
     assert(sar.truncatedAddress(30) === sar)
 
-    assert(lar.truncatedAddress(12) === AddressRecord("id", Some(456L), longAddress.truncatedAddress(12), "en", Some(lc1), None, None, None))
+    assert(lar.truncatedAddress(12) === AddressRecord("id", Some(456L), longAddress.truncatedAddress(12), "en", Some(lc1),
+      Some(BLPUState.In_Use.name), Some(LogicalState.Approved.name), Some(StreetClassification.All_Vehicles.name)))
+  }
+
+  test("withoutMetadata") {
+    assert(sar.withoutMetadata === AddressRecord("id", Some(123L), shortAddress, "en", Some(lc1), None, None, None))
   }
 
   test("asV1") {

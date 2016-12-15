@@ -46,7 +46,9 @@ case class AddressRecord(
 
   def truncatedAddress(maxLen: Int = Address.maxLineLength): AddressRecord =
     if (address.longestLineLength <= maxLen) this
-    else AddressRecord(id, uprn, address.truncatedAddress(maxLen), language, localCustodian, None, None, None)
+    else copy(address = address.truncatedAddress(maxLen))
+
+  def withoutMetadata: AddressRecord = copy(blpuState = None, logicalState = None, streetClassification = None)
 
   def asV1 = v1.AddressRecord(id, uprn, address.asV1, localCustodian.map(_.asV1), language)
 
