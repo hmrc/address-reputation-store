@@ -73,13 +73,12 @@ class CapitalisationTest extends FunSuite {
     tryNormaliseAddressLine("Port na Cloiche")
   }
 
-  ignore(
+  test(
     """Given a street name starting with 'The',
       when normalised,
       then the definite article should be capitalised.
     """) {
     tryNormaliseAddressLine("The Copse")
-    tryNormaliseAddressLine("221b The Copse")
   }
 
   test(
@@ -127,9 +126,7 @@ class CapitalisationTest extends FunSuite {
       when normalised,
       then the name should be presented correctly
     """) {
-    tryNormaliseAddressLine("I'Anson Street") // DL3 0RL
     tryNormaliseAddressLine("11 I'Anson Street") // DL3 0RL
-    tryNormaliseAddressLine("BFPO 123")
   }
 
   test(
