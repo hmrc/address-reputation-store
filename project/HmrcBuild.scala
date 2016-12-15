@@ -43,11 +43,9 @@ private object AppDependencies {
   private val jacksonVersion = "2.7.4"
 
   val compile = Seq(
-    // netty 3.10 has a breaking API change
-    "io.netty" % "netty" % "3.9.9.Final" force(),
     "uk.gov.hmrc" %% "logging" % "0.2.0" withSources(),
     "com.univocity" % "univocity-parsers" % "1.5.6" withSources(),
-    "com.sksamuel.elastic4s" %% "elastic4s-core" % "2.4.0" excludeAll ExclusionRule(organization = "io.netty"),
+    "com.sksamuel.elastic4s" %% "elastic4s-core" % "2.4.0",
     "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
     "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
     "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
@@ -62,7 +60,8 @@ private object AppDependencies {
   object Test {
     def apply() = new TestDependencies {
       override lazy val test = Seq(
-        "org.scalatest" %% "scalatest" % "3.0.1" % scope,
+        "org.scalatest" %% "scalatest" % "2.2.6" % scope,
+        "org.scalactic" %% "scalactic" % "2.2.5" force(),
         "org.scalacheck" %% "scalacheck" % "1.12.2" % scope,
         "org.pegdown" % "pegdown" % "1.5.0" % scope,
         "org.mockito" % "mockito-all" % "1.10.19" % scope

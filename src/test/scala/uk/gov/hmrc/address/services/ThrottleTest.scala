@@ -18,7 +18,7 @@ package uk.gov.hmrc.address.services
 
 import org.mockito.Mockito._
 import org.scalatest.FunSuite
-import org.scalatest.mockito.MockitoSugar
+import org.scalatest.mock.MockitoSugar
 
 class ThrottleTest extends FunSuite with MockitoSugar {
 
