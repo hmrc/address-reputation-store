@@ -18,7 +18,6 @@ package uk.gov.hmrc.address.uk
 
 import org.scalatest.FunSuite
 
-//@RunWith(classOf[JUnitRunner])
 class PostcodeTest extends FunSuite {
 
   test(

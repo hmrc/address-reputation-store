@@ -19,11 +19,13 @@ package uk.gov.hmrc.address.uk
 import java.util.regex.Pattern
 
 case class Postcode(area: String, district: String, sector: String, unit: String) {
-  def outcode = area + district
+  def outcode: String = area + district
 
-  def incode = sector + unit
+  def asOutcode = Outcode(area, district)
 
-  def urlSafe = outcode + "+" + incode
+  def incode: String = sector + unit
+
+  def urlSafe: String = outcode + "+" + incode
 
   override lazy val toString = outcode + " " + incode
 }
@@ -31,8 +33,8 @@ case class Postcode(area: String, district: String, sector: String, unit: String
 
 object Postcode {
   // The basic syntax of a postcode (ignores the rules on valid letter ranges because they don't matter here).
-  private val oPattern = Pattern.compile("^[A-Z]{1,2}[0-9][0-9A-Z]?$")
-  private val iPattern = Pattern.compile("^[0-9][A-Z]{2}$")
+  private[uk] val oPattern = Pattern.compile("^[A-Z]{1,2}[0-9][0-9A-Z]?$")
+  private[uk] val iPattern = Pattern.compile("^[0-9][A-Z]{2}$")
 
   /**
     * Performs normalisation and then checks the syntax, returning None if the string
