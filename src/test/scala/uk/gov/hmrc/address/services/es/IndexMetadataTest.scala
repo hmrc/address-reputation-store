@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,7 +124,6 @@ class IndexMetadataTest extends WordSpec with MockitoSugar {
     assert(metadata === Some(IndexMetadataItem(
       name = name,
       size = Some(123),
-      createdAt = None,
       completedAt = Some(date),
       bulkSize = Some("234"),
       loopDelay = Some("345"),
@@ -203,5 +202,20 @@ class IndexMetadataTest extends WordSpec with MockitoSugar {
       verify(esAdmin, times(2)).waitForGreenStatus(newName.toString)
       verifyNoMoreInteractions(esAdmin)
     }
+  }
+
+  "toggleDoNotdelete" in {
+    val name = IndexName("abc", Some(12), Some("1010101"))
+    val esAdmin = mock[ESAdmin]
+    val logger = new StubLogger
+    val indexMetadata = new IndexMetadata(esAdmin, true, Map(), logger, ec)
+
+    when(esAdmin.getIndexSettings(name.toString)) thenReturn Map.empty[String, String]
+    indexMetadata.toggleDoNotDelete(name)
+    verify(esAdmin).writeIndexSettings(name.toString, Map("index.doNotDelete" -> "true"))
+
+    when(esAdmin.getIndexSettings(name.toString)) thenReturn Map("index.doNotDelete" -> "true")
+    indexMetadata.toggleDoNotDelete(name)
+    verify(esAdmin).writeIndexSettings(name.toString, Map("index.doNotDelete" -> "false"))
   }
 }

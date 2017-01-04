@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,4 +85,3 @@ class AddressRecordConverterTest extends FunSuite {
 
 // AddressRecord(GB4510123533,Some(4510123533),Address(List(10 Taylors Court, 1 Monk Street),Some(Newcastle upon Tyne),None,NE1 5XD,Some(Country(GB-ENG,England)),Country(UK,United Kingdom)),en,None,Some(In_Use),Some(Approved),Some(All_Vehicles))
 // AddressRecord(GB4510123533,Some(4510123533),Address(List(10 Taylors Court, 1 Monk Street),Some(Newcastle upon Tyne),None,NE1 5XD,Some(Country(GB-ENG,England)),Country(UK,United Kingdom)),en,None,None,None,None)
-

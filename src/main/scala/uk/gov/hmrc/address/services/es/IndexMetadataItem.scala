@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import java.util.Date
 
 case class IndexMetadataItem(name: IndexName,
                              size: Option[Int],
-                             createdAt: Option[Date] = None,
                              completedAt: Option[Date] = None,
                              bulkSize: Option[String] = None,
                              loopDelay: Option[String] = None,
@@ -31,11 +30,12 @@ case class IndexMetadataItem(name: IndexName,
                              streetFilter: Option[String] = None,
                              buildVersion: Option[String] = None,
                              buildNumber: Option[String] = None,
-                             aliases: List[String] = Nil) {
+                             aliases: List[String] = Nil,
+                             doNotDelete: Boolean = false) {
 
   def completedAfter(date: Date): Boolean = completedAt.isDefined && completedAt.get.after(date)
 
-  def isIncomplete: Boolean = createdAt.isDefined && completedAt.isEmpty
+  def isIncomplete: Boolean = completedAt.isEmpty
 
-  def isComplete: Boolean = createdAt.isDefined && completedAt.isDefined
+  def isComplete: Boolean = completedAt.isDefined
 }

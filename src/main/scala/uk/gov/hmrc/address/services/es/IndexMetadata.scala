@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,7 @@ class IndexMetadata(esAdmin: ESAdmin, val isCluster: Boolean, numShardsMap: Map[
   private val iStreetFilter = "index.streetFilter"
   private val iBuildVersion = "index.buildVersion"
   private val iBuildNumber = "index.buildNumber"
+  private val iDoNotDelete = "index.doNotDelete"
   private val twoSeconds = TimeValue.timeValueSeconds(2)
 
   //-------------------- Simple facade methods --------------------
@@ -108,12 +109,13 @@ class IndexMetadata(esAdmin: ESAdmin, val isCluster: Boolean, numShardsMap: Map[
     val sFilter = settings.get(iStreetFilter)
     val buildVersion = settings.get(iBuildVersion)
     val buildNumber = settings.get(iBuildNumber)
+    val doNotDelete = settings.get(iDoNotDelete).fold(false)(_.toBoolean)
 
-    Some(IndexMetadataItem(name = name, size = count, createdAt = None, completedAt = completedDate,
+    Some(IndexMetadataItem(name = name, size = count, completedAt = completedDate,
       bulkSize = bSize, loopDelay = lDelay,
       includeDPA = iDPA, includeLPI = iLPI, prefer = pref, streetFilter = sFilter,
       buildVersion = buildVersion, buildNumber = buildNumber,
-      aliases = esAdmin.aliasesFor(index)))
+      aliases = esAdmin.aliasesFor(index), doNotDelete = doNotDelete))
   }
 
   def writeCompletionDateTo(indexName: IndexState, date: Date = new Date()) {
@@ -153,6 +155,14 @@ class IndexMetadata(esAdmin: ESAdmin, val isCluster: Boolean, numShardsMap: Map[
       esAdmin.setReplicationCount(priorIndexes.head, 0)
     }
     esAdmin.waitForGreenStatus(newIndexName)
+  }
+
+  def toggleDoNotDelete(name: IndexName): Unit = {
+    val index = name.formattedName
+    val settings = esAdmin.getIndexSettings(index)
+    val currentVal = settings.get(iDoNotDelete).map(_.toBoolean)
+    val newVal = ! (currentVal.isDefined && currentVal.get)
+    esAdmin.writeIndexSettings(index, Map(iDoNotDelete -> newVal.toString))
   }
 
   private def awaitAll[T](fr: Seq[Future[T]]): Seq[T] = {
