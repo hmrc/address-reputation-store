@@ -6,6 +6,12 @@ This provides an abstraction for the MongoDB access that is used by both
 [address-reputation-ingester](https://github.com/hmrc/address-reputation-ingester) and
 its dependent address-reputation-service.
 
+### Test Data
+
+When running through service manager some test data is preloaded. You can see this test data under [conf/data](https://github.tools.tax.service.gov.uk/HMRC/address-lookup/tree/master/conf/data), for example these [test addresses](https://github.tools.tax.service.gov.uk/HMRC/address-lookup/blob/master/conf/data/testaddresses.csv).
+
+This test data is also pre-loaded in the Dev, QA and Staging instances of the service.
+
 ### Licence
 
 This code is open source software licensed under the 
