@@ -161,7 +161,7 @@ class IndexMetadata(esAdmin: ESAdmin, val isCluster: Boolean, numShardsMap: Map[
     val index = name.formattedName
     val settings = esAdmin.getIndexSettings(index)
     val currentVal = settings.get(iDoNotDelete).map(_.toBoolean)
-    val newVal = ! (currentVal.isDefined && currentVal.get)
+    val newVal = !currentVal.contains(true)
     esAdmin.writeIndexSettings(index, Map(iDoNotDelete -> newVal.toString))
   }
 
