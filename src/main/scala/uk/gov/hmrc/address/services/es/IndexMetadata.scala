@@ -157,12 +157,18 @@ class IndexMetadata(esAdmin: ESAdmin, val isCluster: Boolean, numShardsMap: Map[
     esAdmin.waitForGreenStatus(newIndexName)
   }
 
+  /** @deprecated because it isn't idempotent. */
   def toggleDoNotDelete(name: IndexName): Unit = {
     val index = name.formattedName
     val settings = esAdmin.getIndexSettings(index)
     val currentVal = settings.get(iDoNotDelete).map(_.toBoolean)
     val newVal = !currentVal.contains(true)
     esAdmin.writeIndexSettings(index, Map(iDoNotDelete -> newVal.toString))
+  }
+
+  def setDoNotDelete(name: IndexName, newValue: Boolean): Unit = {
+    val index = name.formattedName
+    esAdmin.writeIndexSettings(index, Map(iDoNotDelete -> newValue.toString))
   }
 
   private def awaitAll[T](fr: Seq[Future[T]]): Seq[T] = {

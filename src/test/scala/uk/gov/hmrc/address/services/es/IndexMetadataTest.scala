@@ -218,4 +218,19 @@ class IndexMetadataTest extends WordSpec with MockitoSugar {
     indexMetadata.toggleDoNotDelete(name)
     verify(esAdmin).writeIndexSettings(name.toString, Map("index.doNotDelete" -> "false"))
   }
+
+  "setDoNotdelete" in {
+    val name = IndexName("abc", Some(12), Some("1010101"))
+    val esAdmin = mock[ESAdmin]
+    val logger = new StubLogger
+    val indexMetadata = new IndexMetadata(esAdmin, true, Map(), logger, ec)
+
+    when(esAdmin.getIndexSettings(name.toString)) thenReturn Map.empty[String, String]
+    indexMetadata.setDoNotDelete(name, true)
+    verify(esAdmin).writeIndexSettings(name.toString, Map("index.doNotDelete" -> "true"))
+
+    when(esAdmin.getIndexSettings(name.toString)) thenReturn Map("index.doNotDelete" -> "true")
+    indexMetadata.setDoNotDelete(name, false)
+    verify(esAdmin).writeIndexSettings(name.toString, Map("index.doNotDelete" -> "false"))
+  }
 }
