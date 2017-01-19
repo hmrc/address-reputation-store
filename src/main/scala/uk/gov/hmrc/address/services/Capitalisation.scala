@@ -21,10 +21,10 @@ import scala.collection.immutable.HashSet
 
 object Capitalisation {
 
-  def normaliseAddressLine(line: String): String = normalise(line.trim.toLowerCase)
+  def normaliseAddressLine(phrase: String*): String = normalise(phrase.map(_.trim.toLowerCase))
 
-  private def normalise(phrase: String): String = {
-    val words: Seq[String] = phrase.split(' ').filterNot(_ == "")
+  private def normalise(phrase: Seq[String]): String = {
+    val words: Seq[String] = phrase.flatMap(_.split(' ').filterNot(_ == ""))
 
     if (words.isEmpty) ""
     else if (words.length == 1) asFirstWord(words.head)

@@ -21,9 +21,9 @@ import org.scalatest.FunSuite
 class CapitalisationTest extends FunSuite {
   import Capitalisation._
 
-  def tryNormaliseAddressLine(expected: String) {
-    assert(normaliseAddressLine(expected.toUpperCase) === expected)
-    assert(normaliseAddressLine(expected.toLowerCase) === expected)
+  def tryNormaliseAddressLine(expected: String*) {
+    assert(normaliseAddressLine(expected.map(_.toUpperCase):_*) === expected.mkString(" "))
+    assert(normaliseAddressLine(expected.map(_.toLowerCase):_*) === expected.mkString(" "))
   }
 
 
@@ -32,6 +32,7 @@ class CapitalisationTest extends FunSuite {
     assert(normaliseAddressLine("") === "", "blank")
     assert(normaliseAddressLine("  ") === "", "blank")
     assert(normaliseAddressLine("UNITS 2 - 5, MANOR COURTYARD") === "Units 2 - 5, Manor Courtyard", "spaces surrounding hyphen")
+    assert(normaliseAddressLine("UNITS", "2 - 5,", "MANOR COURTYARD") === "Units 2 - 5, Manor Courtyard", "multi-string")
     assert(normaliseAddressLine("- - - -") === "- - - -", "alternating hyphens and spaces")
     assert(normaliseAddressLine(" - - - ") === "- - -", "alternating spaces and hyphens")
   }
@@ -149,6 +150,7 @@ class CapitalisationTest extends FunSuite {
       and both letters either side of the apostrophe should be uppercase
     """) {
     tryNormaliseAddressLine("5 Top O'Th' Hill Road") // OL14 6QA
+    tryNormaliseAddressLine("5", "Top O'Th' Hill Road") // OL14 6QA
   }
 
   test(
