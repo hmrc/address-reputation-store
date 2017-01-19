@@ -55,11 +55,7 @@ case class AddressRecord(
 
   def asV1 = v1.AddressRecord(id, uprn, address.asV1, localCustodian.map(_.asV1), language)
 
-  def latitude: Option[BigDecimal] = location.map(_.head)
-
-  def longitude: Option[BigDecimal] = location.map(_(1))
-
-  def locationString: Option[String] = location.map(_.map(_.toString).mkString(","))
+  def locationValue: Option[Location] = location.map(loc => Location(loc.head, loc(1)))
 
   def blpuStateValue: Option[BLPUState] = blpuState.flatMap(v => Option(BLPUState.valueOf(v)))
 

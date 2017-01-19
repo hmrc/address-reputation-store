@@ -17,7 +17,6 @@
 package uk.gov.hmrc.address.v2
 
 import uk.gov.hmrc.address.osgb.DbAddress
-import uk.gov.hmrc.util._
 
 
 
@@ -38,7 +37,7 @@ object AddressRecordConverter {
 
     val language = d.language.getOrElse(English)
 
-    val location = d.location.map(_.divide(',').map(part => BigDecimal(part.trim)))
+    val location = d.location.map(latlong => Location(latlong).toSeq)
 
     val a = new Address(d.lines, d.town, optCounty, d.postcode, optSubdivision, country)
 
