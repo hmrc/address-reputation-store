@@ -37,9 +37,12 @@ case class AddressRecord(
                           // see https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
                           language: String,
                           localCustodian: Option[LocalCustodian],
+                          location: Option[Seq[BigDecimal]],
                           blpuState: Option[String],
                           logicalState: Option[String],
                           streetClassification: Option[String]) {
+
+  require(location.isEmpty || location.get.size == 2, location.get)
 
   @JsonIgnore // needed because the name starts 'is...'
   def isValid: Boolean = address.isValid && language.length == 2
@@ -51,6 +54,12 @@ case class AddressRecord(
   def withoutMetadata: AddressRecord = copy(blpuState = None, logicalState = None, streetClassification = None)
 
   def asV1 = v1.AddressRecord(id, uprn, address.asV1, localCustodian.map(_.asV1), language)
+
+  def latitude: Option[BigDecimal] = location.map(_.head)
+
+  def longitude: Option[BigDecimal] = location.map(_(1))
+
+  def locationString: Option[String] = location.map(_.map(_.toString).mkString(","))
 
   def blpuStateValue: Option[BLPUState] = blpuState.flatMap(v => Option(BLPUState.valueOf(v)))
 

@@ -37,9 +37,12 @@ class AddressRecordConverterTest extends FunSuite {
 
   val lc4510 = LocalCustodian(4510, "Newcastle upon Tyne")
 
-  val ne15xdD1 = DbAddress("GB4510123533", List("10 Taylors Court", "1 Monk Street"), NewcastleUponTyne, "NE1 5XD", Some("GB-ENG"), Some("UK"),
-    Some(lc4510.code), en, InUse, Approved, AllVehicles, None, Some("54.9714759,-1.6187319"))
+  val locationString = "54.9714759,-1.6187319"
 
+  val location = Seq(BigDecimal("54.9714759"), BigDecimal("-1.6187319"))
+
+  val ne15xdD1 = DbAddress("GB4510123533", List("10 Taylors Court", "1 Monk Street"), NewcastleUponTyne, "NE1 5XD", Some("GB-ENG"), Some("UK"),
+    Some(lc4510.code), en, InUse, Approved, AllVehicles, None, Some(locationString))
 
   test(
     """when the reference item is absent,
@@ -49,7 +52,7 @@ class AddressRecordConverterTest extends FunSuite {
     val adr = AddressRecordConverter.convert(ne15xdD1, None, true)
     assert(adr === AddressRecord(
       "GB4510123533", Some(4510123533L), Address(List("10 Taylors Court", "1 Monk Street"),
-        NewcastleUponTyne, None, "NE1 5XD", Some(England), UK), "en", None,
+        NewcastleUponTyne, None, "NE1 5XD", Some(England), UK), "en", None, Some(location),
       Some(BLPUState.In_Use.name), Some(LogicalState.Approved.name), Some(StreetClassification.All_Vehicles.name)
     ))
   }
@@ -62,7 +65,7 @@ class AddressRecordConverterTest extends FunSuite {
     val adr = AddressRecordConverter.convert(ne15xdD1, Some(ri), false)
     assert(adr === AddressRecord(
       "GB4510123533", Some(4510123533L), Address(List("10 Taylors Court", "1 Monk Street"),
-        NewcastleUponTyne, TyneAndWear, "NE1 5XD", Some(England), UK), "en", Some(lc4510),
+        NewcastleUponTyne, TyneAndWear, "NE1 5XD", Some(England), UK), "en", Some(lc4510), Some(location),
       None, None, None
     ))
   }
@@ -76,9 +79,22 @@ class AddressRecordConverterTest extends FunSuite {
     val adr = AddressRecordConverter.convert(ne15xdD1, Some(ri), true)
     assert(adr === AddressRecord(
       "GB4510123533", Some(4510123533L), Address(List("10 Taylors Court", "1 Monk Street"),
-        NewcastleUponTyne, TyneAndWear, "NE1 5XD", Some(England), UK), "en", Some(lc4510),
+        NewcastleUponTyne, TyneAndWear, "NE1 5XD", Some(England), UK), "en", Some(lc4510), Some(location),
       Some(BLPUState.In_Use.name), Some(LogicalState.Approved.name), Some(StreetClassification.All_Vehicles.name)
     ))
+  }
+
+  test(
+    """should convert location, ignoring whitespace
+    """) {
+    val locationString2 = " 54.9714759, -1.6187319 "
+    val ne15xdD1B = ne15xdD1.copy(location = Some(locationString2))
+    val ri = ReferenceItem(lc4510.code, lc4510.name, TyneAndWear)
+    val adr = AddressRecordConverter.convert(ne15xdD1B, Some(ri), true)
+    assert(adr.location === Some(location))
+    assert(adr.locationString === Some(locationString))
+    assert(adr.latitude === Some(BigDecimal("54.9714759")))
+    assert(adr.longitude === Some(BigDecimal("-1.6187319")))
   }
 
 }

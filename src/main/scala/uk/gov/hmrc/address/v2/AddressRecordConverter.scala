@@ -17,6 +17,8 @@
 package uk.gov.hmrc.address.v2
 
 import uk.gov.hmrc.address.osgb.DbAddress
+import uk.gov.hmrc.util._
+
 
 
 case class ReferenceItem(code: Int, localCustodian: String, county: Option[String])
@@ -36,6 +38,8 @@ object AddressRecordConverter {
 
     val language = d.language.getOrElse(English)
 
+    val location = d.location.map(_.divide(',').map(part => BigDecimal(part.trim)))
+
     val a = new Address(d.lines, d.town, optCounty, d.postcode, optSubdivision, country)
 
     val blpuState = if (incMetadata) d.blpuState.flatMap(BLPUStateHelper.codeToString) else None
@@ -44,7 +48,7 @@ object AddressRecordConverter {
 
     val streetClassification = if (incMetadata) d.streetClass.flatMap(StreetClassificationHelper.codeToString) else None
 
-    new AddressRecord(d.id, Some(d.uprn), a, language, optLC, blpuState, logicalState, streetClassification)
+    new AddressRecord(d.id, Some(d.uprn), a, language, optLC, location, blpuState, logicalState, streetClassification)
   }
 
   final val English = "en"
