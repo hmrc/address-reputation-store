@@ -151,9 +151,6 @@ class IndexMetadata(esAdmin: ESAdmin, val isCluster: Boolean, numShardsMap: Map[
 
     val priorIndexes = esAdmin.switchAliases(newIndexName, productName, ariAliasName)
 
-    if (isCluster) {
-      esAdmin.setReplicationCount(priorIndexes.head, 0)
-    }
     esAdmin.waitForGreenStatus(newIndexName)
   }
 

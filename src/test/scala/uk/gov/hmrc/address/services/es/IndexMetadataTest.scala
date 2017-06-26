@@ -198,7 +198,7 @@ class IndexMetadataTest extends WordSpec with MockitoSugar {
 
       verify(esAdmin).setReplicationCount(newName.toString, 1)
       verify(esAdmin).switchAliases(newName.toString, newName.productName, IndexMetadata.ariAliasName)
-      verify(esAdmin).setReplicationCount(oldName.toString, 0)
+      verify(esAdmin,times(0)).setReplicationCount(oldName.toString, 0)
       verify(esAdmin, times(2)).waitForGreenStatus(newName.toString)
       verifyNoMoreInteractions(esAdmin)
     }
