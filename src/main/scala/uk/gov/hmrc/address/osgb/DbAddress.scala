@@ -52,7 +52,8 @@ case class DbAddress(
                       logicalState: Option[Int],
                       streetClass: Option[Int],
                       blpuClass: Option[String],
-                      location: Option[String]
+                      location: Option[String],
+                      isPOBox: Option[Boolean] = None
                     ) extends Document {
 
   // UPRN is specified to be an integer of up to 12 digits (it can also be assumed to be always positive)
@@ -85,7 +86,8 @@ case class DbAddress(
       logicalState.toList.map("logicalState" -> _) ++
       streetClass.toList.map("streetClass" -> _) ++
       blpuClass.toList.map("blpuClass" -> _) ++
-      location.toList.map("location" -> _)
+      location.toList.map("location" -> _) ++
+      isPOBox.toList.map("isPOBox" -> _)
   }
 
   // We're still providing two structures for the lines, pending a decision on how ES will be used.
@@ -107,7 +109,8 @@ case class DbAddress(
       logicalState.toList.map("logicalState" -> _) ++
       streetClass.toList.map("streetClass" -> _) ++
       blpuClass.toList.map("blpuClass" -> _) ++
-      location.toList.map("location" -> _)
+      location.toList.map("location" -> _) ++
+      isPOBox.toList.map("isPOBox" -> _)
   }
 
   def forMongoDb: List[(String, Any)] = tupled ++ List("_id" -> id)
@@ -159,7 +162,8 @@ object DbAddress {
       fields.get("logicalState").map(toInteger),
       fields.get("streetClass").map(toInteger),
       fields.get("blpuClass").map(_.toString),
-      fields.get("location").map(_.toString)
+      fields.get("location").map(_.toString),
+      fields.get("isPOBox").map(toBoolean)
     )
   }
 
@@ -169,6 +173,14 @@ object DbAddress {
       case o: JInteger => o.toInt
       case s: JShort => s.toInt
       case _ => v.toString.toInt
+    }
+
+  private def toBoolean(v: Any): Boolean =
+    v match {
+      case i: Int => if (i == 0) false else true
+      case b: Boolean => b
+      case s: String => s.toBoolean
+      case _ => v.toString.toBoolean
     }
 
   private def toFloat(v: Any): Float =

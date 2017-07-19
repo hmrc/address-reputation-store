@@ -89,14 +89,21 @@ class EsAddressIntegration extends FunSuite with BeforeAndAfterAll {
     searchResponse map convertSearchResponse
   }
 
+  def findPOBox(isPOBox: Boolean): Future[List[DbAddress]] = {
+    val resp = esClient.execute {
+      search in idx -> doc query matchQuery("isPOBox", isPOBox) size 100
+    }
+    resp map convertSearchResponse
+  }
+
   //-----------------------------------------------------------------------------------------------
 
   import DbAddress._
 
   val a1 = DbAddress("GB47070784", List("A1", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"),
-    Some("UK"), Some(1234), Some(English), Some(2), Some(1), Some(8), Some("1"), Some("1.0,-1.0"))
+    Some("UK"), Some(1234), Some(English), Some(2), Some(1), Some(8), Some("1"), Some("1.0,-1.0"), Some(true))
   val a2 = DbAddress("GB47070785", List("A2", "Line2", "Line3"), Some("Tynemouth"), "NE30 4HG", Some("GB-ENG"),
-    Some("UK"), Some(1234), Some(English), Some(2), Some(1), Some(8), Some("1"), Some("1.0,-1.0"))
+    Some("UK"), Some(1234), Some(English), Some(2), Some(1), Some(8), Some("1"), Some("1.0,-1.0"), Some(false))
 
   test("ES write then findPostcode") {
     output(a1)
@@ -118,6 +125,19 @@ class EsAddressIntegration extends FunSuite with BeforeAndAfterAll {
 
     val r = Await.result(findID(a1.id), 20.seconds)
     assert(r === List(a1))
+  }
+
+  test("find PO Box") {
+    output(a1)
+    output(a2)
+
+    Thread.sleep(1200) // more than 1 second needed for ES stabilisation
+    waitForIndex(idx)
+
+    val r = Await.result(findPOBox(true), 20.seconds)
+    assert(r === List(a1))
+    val r2 = Await.result(findPOBox(false), 20.seconds)
+    assert(r2 === List(a2))
   }
 
 }
