@@ -19,7 +19,7 @@ package uk.gov.hmrc.address.services.es
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s._
 import com.sksamuel.elastic4s.mappings.DynamicMapping
-import com.sksamuel.elastic4s.mappings.FieldType.{GeoPointType, ShortType, StringType, BooleanType}
+import com.sksamuel.elastic4s.mappings.FieldType.{GeoPointType, ShortType, StringType}
 
 object ESSchema {
 
@@ -70,7 +70,7 @@ object ESSchema {
         field("streetClass") typed ShortType,
         field("blpuClass") typed StringType index NotAnalyzed,
         field("location") typed GeoPointType,
-        field("isPOBox") typed BooleanType index NotAnalyzed
+        field("poBox") typed StringType index NotAnalyzed
         )
     }
   }

@@ -53,7 +53,7 @@ case class DbAddress(
                       streetClass: Option[Int],
                       blpuClass: Option[String],
                       location: Option[String],
-                      isPOBox: Option[Boolean] = None
+                      poBox: Option[String] = None
                     ) extends Document {
 
   // UPRN is specified to be an integer of up to 12 digits (it can also be assumed to be always positive)
@@ -87,7 +87,7 @@ case class DbAddress(
       streetClass.toList.map("streetClass" -> _) ++
       blpuClass.toList.map("blpuClass" -> _) ++
       location.toList.map("location" -> _) ++
-      isPOBox.toList.map("isPOBox" -> _)
+      poBox.toList.map("poBox" -> _)
   }
 
   // We're still providing two structures for the lines, pending a decision on how ES will be used.
@@ -110,7 +110,7 @@ case class DbAddress(
       streetClass.toList.map("streetClass" -> _) ++
       blpuClass.toList.map("blpuClass" -> _) ++
       location.toList.map("location" -> _) ++
-      isPOBox.toList.map("isPOBox" -> _)
+      poBox.toList.map("poBox" -> _)
   }
 
   def forMongoDb: List[(String, Any)] = tupled ++ List("_id" -> id)
@@ -163,7 +163,7 @@ object DbAddress {
       fields.get("streetClass").map(toInteger),
       fields.get("blpuClass").map(_.toString),
       fields.get("location").map(_.toString),
-      fields.get("isPOBox").map(toBoolean)
+      fields.get("poBox").map(_.toString)
     )
   }
 
@@ -173,14 +173,6 @@ object DbAddress {
       case o: JInteger => o.toInt
       case s: JShort => s.toInt
       case _ => v.toString.toInt
-    }
-
-  private def toBoolean(v: Any): Boolean =
-    v match {
-      case i: Int => if (i == 0) false else true
-      case b: Boolean => b
-      case s: String => s.toBoolean
-      case _ => v.toString.toBoolean
     }
 
   private def toFloat(v: Any): Float =
