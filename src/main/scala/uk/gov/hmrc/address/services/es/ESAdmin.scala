@@ -23,7 +23,7 @@ import org.elasticsearch.common.unit.TimeValue
 import uk.gov.hmrc.logging.SimpleLogger
 
 import scala.collection.JavaConverters._
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 /** Provides a facade for low-level ES administration operations. */
@@ -221,7 +221,7 @@ class ESAdminImpl(override val clients: List[ElasticClient], logger: SimpleLogge
 
         client execute {
           aliases(removeStatements ++ addStatements)
-        } await()
+        } await(10.minutes)
 
         existingIndexes
       }
