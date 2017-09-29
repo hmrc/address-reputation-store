@@ -191,7 +191,7 @@ class ESAdminImpl(override val clients: List[ElasticClient], logger: SimpleLogge
           update settings indexName set Map(
             "index.number_of_replicas" -> replicaCount.toString
           )
-        } await()
+        } await(10.minutes)
       }
     }
     awaitAll(fr)
@@ -221,7 +221,7 @@ class ESAdminImpl(override val clients: List[ElasticClient], logger: SimpleLogge
 
         client execute {
           aliases(removeStatements ++ addStatements)
-        } await(10.minutes)
+        } await()
 
         existingIndexes
       }
