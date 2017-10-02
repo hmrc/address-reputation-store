@@ -66,25 +66,35 @@ trait ESAdmin {
 
 
 /** Provides a facade for low-level ES administration operations. */
-class ESAdminImpl(override val clients: List[ElasticClient], logger: SimpleLogger, ec: ExecutionContext) extends ESAdmin {
+class ESAdminImpl(override val clients: List[ElasticClient], logger: SimpleLogger, ec: ExecutionContext, settings: ElasticSettings) extends ESAdmin {
 
   private implicit val xec = ec
 
   val healthCheckTimeout: TimeValue = TimeValue.timeValueMinutes(10)
 
+  val connectionAttemptLimit: Int = 3
+
   def indexExists(name: String): Boolean = existingIndexNames.contains(name)
 
-  def existingIndexNames: List[String] = {
-    val healths = clients.head.execute {
-      get cluster health
-    } await()
+  private val wrapper = new ElasticClientWrapper(clients, settings, logger)
 
-    healths.getIndices.keySet.asScala.toList.sorted
+  def existingIndexNames: List[String] = {
+    wrapper.withReinitialization(0, connectionAttemptLimit) {
+      val c = wrapper.clients
+      val healths = c.head.execute {
+        get cluster health
+      } await()
+
+      healths.getIndices.keySet.asScala.toList.sorted
+    }
   }
 
   def deleteIndex(name: String) {
-    clients foreach { client =>
-      client.admin.indices.delete(new DeleteIndexRequest(name)).actionGet
+    wrapper.withReinitialization(0, connectionAttemptLimit) {
+      val c = wrapper.clients
+      c foreach { client =>
+        client.admin.indices.delete(new DeleteIndexRequest(name)).actionGet
+      }
     }
   }
 
@@ -92,48 +102,63 @@ class ESAdminImpl(override val clients: List[ElasticClient], logger: SimpleLogge
     if (!shardsAreStable(indexName))
       None // not yet in a steady state
     else {
-      val n = clients.head.execute {
-        search in indexName / documentName size 0
-      }.await.totalHits
-      Some(n.toInt)
+      wrapper.withReinitialization(0, connectionAttemptLimit) {
+        val c = wrapper.clients
+        val n = c.head.execute {
+          search in indexName / documentName size 0
+        }.await.totalHits
+        Some(n.toInt)
+      }
     }
   }
 
   def getIndexSettings(indexName: String): Map[String, String] = {
-    val indexSettingsResponse = clients.head.execute {
-      get settings indexName
-    } await()
+    wrapper.withReinitialization(0, connectionAttemptLimit) {
+      val c = wrapper.clients
+      val indexSettingsResponse = c.head.execute {
+        get settings indexName
+      } await()
 
-    indexSettingsResponse.getIndexToSettings.get(indexName).getAsMap.asScala.toMap
+      indexSettingsResponse.getIndexToSettings.get(indexName).getAsMap.asScala.toMap
+    }
   }
 
   def writeIndexSettings(indexName: String, settings: Map[String, String]) {
-    clients foreach { client =>
-      greenHealth(client, healthCheckTimeout, indexName)
+    wrapper.withReinitialization(0, connectionAttemptLimit) {
+      val c = wrapper.clients
+      c foreach { client =>
+        greenHealth(client, healthCheckTimeout, indexName)
 
-      client execute {
-        closeIndex(indexName)
-      } await()
+        client execute {
+          closeIndex(indexName)
+        } await()
 
-      client execute {
-        update settings indexName set settings
-      } await()
+        client execute {
+          update settings indexName set settings
+        } await()
 
-      client.execute {
-        openIndex(indexName)
-      } await()
+        client.execute {
+          openIndex(indexName)
+        } await()
 
-      greenHealth(client, healthCheckTimeout, indexName)
+        greenHealth(client, healthCheckTimeout, indexName)
+      }
     }
   }
 
   def shardsAreStable(indexName: String): Boolean = {
-    val indicesStatsResponse = clients.head.admin.indices.prepareStats(indexName).all.execute.actionGet
-    indicesStatsResponse.getTotalShards == indicesStatsResponse.getSuccessfulShards + indicesStatsResponse.getFailedShards
+    wrapper.withReinitialization(0, connectionAttemptLimit) {
+      val c = wrapper.clients
+      val indicesStatsResponse = c.head.admin.indices.prepareStats(indexName).all.execute.actionGet
+      indicesStatsResponse.getTotalShards == indicesStatsResponse.getSuccessfulShards + indicesStatsResponse.getFailedShards
+    }
   }
 
   def waitForGreenStatus(indices: String*) {
-    clients.foreach(client => greenHealth(client, healthCheckTimeout, indices: _*))
+    wrapper.withReinitialization(0, connectionAttemptLimit) {
+      val c = wrapper.clients
+      c.foreach(client => greenHealth(client, healthCheckTimeout, indices: _*))
+    }
   }
 
   private def greenHealth(client: ElasticClient, timeout: TimeValue, index: String*) = {
@@ -145,10 +170,13 @@ class ESAdminImpl(override val clients: List[ElasticClient], logger: SimpleLogge
   }
 
   private def indexesAliasedBy(aliasName: String): List[String] = {
-    val gar = queryAliases(clients.head) {
-      getAlias(aliasName)
+    wrapper.withReinitialization(0, connectionAttemptLimit) {
+      val c = wrapper.clients
+      val gar = queryAliases(c.head) {
+        getAlias(aliasName)
+      }
+      gar.keys.toList
     }
-    gar.keys.toList
   }
 
   def aliasesFor(indexName: String): List[String] = {
@@ -158,8 +186,11 @@ class ESAdminImpl(override val clients: List[ElasticClient], logger: SimpleLogge
   }
 
   def allAliases: Map[String, List[String]] = {
-    queryAliases(clients.head) {
-      getAlias("*")
+    wrapper.withReinitialization(0, connectionAttemptLimit) {
+      val c = wrapper.clients
+      queryAliases(c.head) {
+        getAlias("*")
+      }
     }
   }
 
@@ -184,52 +215,59 @@ class ESAdminImpl(override val clients: List[ElasticClient], logger: SimpleLogge
 
   def setReplicationCount(indexName: String, replicaCount: Int) {
     require(0 <= replicaCount && replicaCount < 16)
-    val fr = clients map {
-      client => Future {
-        logger.info(s"Setting replica count to $replicaCount for $indexName")
-        client execute {
-          update settings indexName set Map(
-            "index.number_of_replicas" -> replicaCount.toString
-          )
-        } await(10.minutes)
+    wrapper.withReinitialization(0, connectionAttemptLimit) {
+      val c = wrapper.clients
+      val fr = c map {
+        client => Future {
+          logger.info(s"Setting replica count to $replicaCount for $indexName")
+          client execute {
+            update settings indexName set Map(
+              "index.number_of_replicas" -> replicaCount.toString
+            )
+          } await()
+        }
       }
+      awaitAll(fr)
     }
-    awaitAll(fr)
   }
 
   // atomic transfer from existing to new
   def switchAliases(newIndexName: String,
                     productName: String,
                     umbrellaAlias: String = "address-reputation-data"): Set[String] = {
-    val fr = clients map {
-      client => Future {
-        val existingMap = queryAliases(client) {
-          getAlias(productName).on("*")
+    wrapper.withReinitialization(0, connectionAttemptLimit) {
+      val c = wrapper.clients
+      val fr = c map {
+        client => Future {
+          val existingMap = queryAliases(client) {
+            getAlias(productName).on("*")
+          }
+
+          val existingIndexes = existingMap.keys.toSeq
+
+          val removeStatements = existingIndexes.flatMap {
+            indexName =>
+              logger.info(s"Removing index $indexName from $umbrellaAlias and $productName aliases")
+              Seq(remove alias umbrellaAlias on indexName, remove alias productName on indexName)
+          }
+
+          val addStatements = Seq(add alias umbrellaAlias on newIndexName, add alias productName on newIndexName)
+
+          logger.info(s"Adding index $newIndexName to $umbrellaAlias and $productName")
+
+          client execute {
+            aliases(removeStatements ++ addStatements)
+          } await(10.minutes)
+
+          existingIndexes
         }
-
-        val existingIndexes = existingMap.keys.toSeq
-
-        val removeStatements = existingIndexes.flatMap {
-          indexName =>
-            logger.info(s"Removing index $indexName from $umbrellaAlias and $productName aliases")
-            Seq(remove alias umbrellaAlias on indexName, remove alias productName on indexName)
-        }
-
-        val addStatements = Seq(add alias umbrellaAlias on newIndexName, add alias productName on newIndexName)
-
-        logger.info(s"Adding index $newIndexName to $umbrellaAlias and $productName")
-
-        client execute {
-          aliases(removeStatements ++ addStatements)
-        } await()
-
-        existingIndexes
       }
+      awaitAll(fr).flatten.toSet // will typically yield a set of just one name
     }
-    awaitAll(fr).flatten.toSet // will typically yield a set of just one name
   }
 
   private def awaitAll[T](fr: Seq[Future[T]]): Seq[T] = {
-    Await.result(Future.sequence(fr), Duration("60s"))
+    Await.result(Future.sequence(fr), 60.seconds)
   }
+
 }

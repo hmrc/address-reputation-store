@@ -116,3 +116,54 @@ object ElasticsearchHelper {
     }
   }
 }
+
+trait ElasticReinitializer {
+
+  def reinitialize: List[ElasticClient]
+
+}
+
+class DefaultElasticReinitializer(settings: ElasticSettings, logger: SimpleLogger) extends ElasticReinitializer {
+
+  override def reinitialize = ElasticsearchHelper.buildClients(settings, logger)
+
+}
+
+class ElasticClientWrapper(clientList: List[ElasticClient], settings: ElasticSettings, logger: SimpleLogger) {
+
+  val reinitializer: ElasticReinitializer = new DefaultElasticReinitializer(settings, logger)
+
+  private val mutable: java.util.Deque[List[ElasticClient]] = new java.util.concurrent.ConcurrentLinkedDeque()
+  updateClients(clientList)
+
+  def clients: List[ElasticClient] = {
+    mutable.peekFirst()
+  }
+
+  // attempt count is zero-based
+  def withReinitialization[T](attempt: Int, limit: Int)(f: => T): T = {
+    try {
+      f
+    } catch {
+      case nnae: NoNodeAvailableException => {
+        if (attempt < limit) {
+          reinitialize
+          withReinitialization(attempt + 1, limit) {
+            f
+          }
+        } else throw nnae
+      }
+      case e => throw e
+    }
+  }
+
+  private def reinitialize: Unit = updateClients(reinitializer.reinitialize)
+
+  private def updateClients(clients: List[ElasticClient]) {
+    mutable.addFirst(clients)
+    if (mutable.size() > 1) {
+      mutable.removeLast()
+    }
+  }
+
+}
