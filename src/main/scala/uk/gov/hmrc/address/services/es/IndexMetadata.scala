@@ -125,7 +125,8 @@ class IndexMetadata(esAdmin: ESAdmin, val isCluster: Boolean, numShardsMap: Map[
   def writeIngestSettingsTo(indexName: IndexState, writerSettings: WriterSettings, provenance: BuildProvenance) {
     val buildVersion = provenance.version.map(iBuildVersion -> _)
     val buildNumber = provenance.number.map(iBuildNumber -> _)
-    esAdmin.writeIndexSettings(indexName.formattedName,
+    val newIndexName = indexName.formattedName
+    esAdmin.writeIndexSettings(newIndexName,
       Map(
         iBulkSize -> writerSettings.bulkSize.toString,
         iLoopDelay -> writerSettings.loopDelay.toString,
@@ -135,6 +136,10 @@ class IndexMetadata(esAdmin: ESAdmin, val isCluster: Boolean, numShardsMap: Map[
         iStreetFilter -> writerSettings.algorithm.streetFilter.toString
       ) ++ buildVersion ++ buildNumber
     )
+    if (isCluster) {
+      status.info(s"Increasing replication count for $newIndexName")
+      esAdmin.setReplicationCount(newIndexName, 1)
+    }
   }
 
   def setIndexInUse(name: IndexName) {
@@ -142,9 +147,6 @@ class IndexMetadata(esAdmin: ESAdmin, val isCluster: Boolean, numShardsMap: Map[
     val productName = name.productName
 
     if (isCluster) {
-      status.info(s"Increasing replication count for $newIndexName")
-      esAdmin.setReplicationCount(newIndexName, 1)
-
       status.info(s"Waiting for $ariAliasName to go green after increasing replica count")
       esAdmin.waitForGreenStatus(newIndexName)
     }

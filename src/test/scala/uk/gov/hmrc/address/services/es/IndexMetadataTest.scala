@@ -172,6 +172,19 @@ class IndexMetadataTest extends WordSpec with MockitoSugar {
     ))
   }
 
+  "set replication count after writing index settings" in {
+    val tstamp = 123456789L
+    val date = new Date(tstamp)
+    val name = IndexName("abc", Some(12), Some("1010101"))
+    val esAdmin = mock[ESAdmin]
+    val logger = new StubLogger
+
+    val indexMetadata = new IndexMetadata(esAdmin, true, Map(), logger, ec)
+    indexMetadata.writeIngestSettingsTo(name, WriterSettings(123, 456, Algorithm.default), BuildProvenance(Some("v1"), Some("987")))
+
+    verify(esAdmin).setReplicationCount(name.formattedName, 1)
+  }
+
   "setIndexInUse" must {
     "handle non-clustered" in {
       val name = IndexName("abc", Some(12), Some("1010101"))
@@ -196,7 +209,7 @@ class IndexMetadataTest extends WordSpec with MockitoSugar {
       val indexMetadata = new IndexMetadata(esAdmin, true, Map(), logger, ec)
       indexMetadata.setIndexInUse(newName)
 
-      verify(esAdmin).setReplicationCount(newName.toString, 1)
+      verify(esAdmin, times(0)).setReplicationCount(newName.toString, 1)
       verify(esAdmin).switchAliases(newName.toString, newName.productName, IndexMetadata.ariAliasName)
       verify(esAdmin,times(0)).setReplicationCount(oldName.toString, 0)
       verify(esAdmin, times(2)).waitForGreenStatus(newName.toString)
