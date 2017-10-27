@@ -89,8 +89,6 @@ class OutputESWriter(model: IndexState, statusLogger: SimpleLogger, indexMetadat
         }
       }
       Future.sequence(fuss).await(Duration.Inf)
-
-      indexMetadata.writeCompletionDateTo(model)
     }
 
     statusLogger.info(s"Finished ingesting to index $indexName")
