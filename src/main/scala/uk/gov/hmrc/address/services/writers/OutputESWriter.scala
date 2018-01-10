@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,13 @@ package uk.gov.hmrc.address.services.writers
 import java.util.Date
 
 import com.sksamuel.elastic4s._
+import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsResponse
 import uk.gov.hmrc.BuildProvenance
 import uk.gov.hmrc.address.osgb.DbAddress
 import uk.gov.hmrc.address.services.es.{ESSchema, IndexMetadata, IndexState}
 import uk.gov.hmrc.logging.SimpleLogger
 
+import scala.collection.immutable
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -89,6 +91,7 @@ class OutputESWriter(model: IndexState, statusLogger: SimpleLogger, indexMetadat
         }
       }
       Future.sequence(fuss).await(Duration.Inf)
+      indexMetadata.writeCompletionDateTo(model)
     }
 
     statusLogger.info(s"Finished ingesting to index $indexName")
