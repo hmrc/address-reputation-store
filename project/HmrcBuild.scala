@@ -47,7 +47,7 @@ private object AppDependencies {
   private val jacksonVersion = "2.7.4"
 
   val compile = Seq(
-    "uk.gov.hmrc" %% "logging" % "0.5.0" withSources(),
+    "uk.gov.hmrc" %% "logging" % "0.6.0" withSources(),
     "com.univocity" % "univocity-parsers" % "1.5.6" withSources(),
     "com.sksamuel.elastic4s" %% "elastic4s-core" % "2.4.0",
     "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
