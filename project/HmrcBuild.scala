@@ -44,7 +44,7 @@ private object AppDependencies {
 
   // Important note: Play is *not* a dependency here, nor is it a transitive dependency.
 
-  private val jacksonVersion = "2.7.4"
+  private val jacksonVersion = "2.8.9"
 
   val compile = Seq(
     "uk.gov.hmrc" %% "logging" % "0.6.0" withSources(),
