@@ -4,7 +4,7 @@
 
 This provides an abstraction for the MongoDB access that is used by both
 [address-reputation-ingester](https://github.com/hmrc/address-reputation-ingester) and
-its dependent address-reputation-service.
+its dependent [address-lookup](https://github.com/hmrc/address-lookup) microservice.
 
 ### Test Data
 
