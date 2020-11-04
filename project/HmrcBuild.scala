@@ -21,6 +21,7 @@ import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 import uk.gov.hmrc.SbtAutoBuildPlugin
 import uk.gov.hmrc.SbtArtifactory.autoImport.makePublicallyAvailableOnBintray
 import uk.gov.hmrc.SbtArtifactory
+import sbt.Keys.crossScalaVersions
 
 object HmrcBuild extends Build {
 
@@ -28,15 +29,18 @@ object HmrcBuild extends Build {
 
   val appName = "address-reputation-store"
 
+  val scala2_11 = "2.11.8"
+  val scala2_12 = "2.12.12"
+
   lazy val library = Project(appName, file("."))
     .enablePlugins(SbtAutoBuildPlugin, SbtGitVersioning, SbtArtifactory)
     .settings(majorVersion := 2)
     .settings(
       scalaVersion := "2.11.8",
       libraryDependencies ++= AppDependencies(),
-      crossScalaVersions := Seq("2.11.8"),
       parallelExecution in Test := false,
-      makePublicallyAvailableOnBintray := true
+      makePublicallyAvailableOnBintray := true,
+      crossScalaVersions := Seq(scala2_11, scala2_12)
     )
 }
 
