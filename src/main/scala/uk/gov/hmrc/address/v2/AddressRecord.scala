@@ -40,7 +40,8 @@ case class AddressRecord(
                           location: Option[Seq[BigDecimal]],
                           blpuState: Option[String],
                           logicalState: Option[String],
-                          streetClassification: Option[String]) {
+                          streetClassification: Option[String],
+                          administrativeArea: Option[String] = None) {
 
   require(location.isEmpty || location.get.size == 2, location.get)
 
