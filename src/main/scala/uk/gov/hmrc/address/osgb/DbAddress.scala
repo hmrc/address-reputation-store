@@ -53,7 +53,8 @@ case class DbAddress(
                       streetClass: Option[Int],
                       blpuClass: Option[String],
                       location: Option[String],
-                      poBox: Option[String] = None
+                      poBox: Option[String] = None,
+                      administrativeArea: Option[String] = None
                     ) extends Document {
 
   // UPRN is specified to be an integer of up to 12 digits (it can also be assumed to be always positive)
@@ -87,14 +88,18 @@ case class DbAddress(
       streetClass.toList.map("streetClass" -> _) ++
       blpuClass.toList.map("blpuClass" -> _) ++
       location.toList.map("location" -> _) ++
-      poBox.toList.map("poBox" -> _)
+      poBox.toList.map("poBox" -> _) ++
+      administrativeArea.toList.map("administrativeArea" -> _)
   }
 
   // We're still providing two structures for the lines, pending a decision on how ES will be used.
   def tupledFlat: List[(String, Any)] = {
     def optLine1 = if (lines.nonEmpty) List(lines.head) else Nil
+
     def optLine2 = if (lines.size > 1) List(lines(1)) else Nil
+
     def optLine3 = if (lines.size > 2) List(lines(2)) else Nil
+
     List(
       "postcode" -> postcode) ++
       optLine1.map("line1" -> _) ++
@@ -110,7 +115,8 @@ case class DbAddress(
       streetClass.toList.map("streetClass" -> _) ++
       blpuClass.toList.map("blpuClass" -> _) ++
       location.toList.map("location" -> _) ++
-      poBox.toList.map("poBox" -> _)
+      poBox.toList.map("poBox" -> _) ++
+      administrativeArea.toList.map("administrativeArea" -> _)
   }
 
   def forMongoDb: List[(String, Any)] = tupled ++ List("_id" -> id)
@@ -163,7 +169,8 @@ object DbAddress {
       fields.get("streetClass").map(toInteger),
       fields.get("blpuClass").map(_.toString),
       fields.get("location").map(_.toString),
-      fields.get("poBox").map(_.toString)
+      fields.get("poBox").map(_.toString),
+      fields.get("administrativeArea").map(_.toString)
     )
   }
 
