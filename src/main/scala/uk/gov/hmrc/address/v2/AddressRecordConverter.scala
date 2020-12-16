@@ -47,7 +47,7 @@ object AddressRecordConverter {
 
     val streetClassification = if (incMetadata) d.streetClass.flatMap(StreetClassificationHelper.codeToString) else None
 
-    new AddressRecord(d.id, Some(d.uprn), a, language, optLC, location, blpuState, logicalState, streetClassification)
+    new AddressRecord(d.id, Some(d.uprn), a, language, optLC, location, blpuState, logicalState, streetClassification, d.administrativeArea)
   }
 
   final val English = "en"
