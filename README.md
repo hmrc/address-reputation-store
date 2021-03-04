@@ -1,5 +1,5 @@
 # NOTE
-This repo is deprecated and is no longer used - it will be removed in the near future.
+# This repo is deprecated and is no longer used - it will be removed in the near future.
 
 # address-reputation-store
 
