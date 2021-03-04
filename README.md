@@ -1,3 +1,6 @@
+# NOTE
+This repo is deprecated and is no longer used - it will be removed in the near future.
+
 # address-reputation-store
 
 [![Build Status](https://travis-ci.org/hmrc/address-reputation-store.svg?branch=master)](https://travis-ci.org/hmrc/address-reputation-store) [ ![Download](https://api.bintray.com/packages/hmrc/releases/address-reputation-store/images/download.svg) ](https://bintray.com/hmrc/releases/address-reputation-store/_latestVersion)
